@@ -1,0 +1,3 @@
+FSM(0, AcceptingStates(0),
+    Transitions(t(0,ReqSetup(3),0), t(0,ReqWork(4),0), 
+                t(0,ResSetup(3),0), t(0,ResWork(4),0)))

@@ -1,0 +1,1 @@
+msbuild && rmdir /S /Q SchedulerModel\obj"

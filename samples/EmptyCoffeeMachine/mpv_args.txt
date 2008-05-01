@@ -1,0 +1,19 @@
+#--------------------------
+# Sample settings for mpv
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\EmptyCoffeeMachineModel.dll
+
+#
+# Factory method of the model program that is being viewed
+#
+EmptyCoffeeMachine.Model.Make
+
+#
+# Viewer settings
+#
+/acceptingStatesMarked-
+/stateShape:Circle

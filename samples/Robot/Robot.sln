@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotModel", "RobotModel\RobotModel.csproj", "{42ADDD85-F6A5-45C9-B00E-2E681751F86C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotImpl", "RobotImpl\RobotImpl.csproj", "{9EEFB7B8-56CE-43D2-94A5-6D60F132438F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42ADDD85-F6A5-45C9-B00E-2E681751F86C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42ADDD85-F6A5-45C9-B00E-2E681751F86C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42ADDD85-F6A5-45C9-B00E-2E681751F86C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42ADDD85-F6A5-45C9-B00E-2E681751F86C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EEFB7B8-56CE-43D2-94A5-6D60F132438F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EEFB7B8-56CE-43D2-94A5-6D60F132438F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EEFB7B8-56CE-43D2-94A5-6D60F132438F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EEFB7B8-56CE-43D2-94A5-6D60F132438F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,180 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9E9EA768-11CF-49DA-919F-3BD3C3EA942B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NModel</RootNamespace>
+    <AssemblyName>NModel</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Modeling.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\NModel.XML</DocumentationFile>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRules>-Microsoft.Globalization#CA1301;-Microsoft.Globalization#CA1302;-Microsoft.Globalization#CA1303;-Microsoft.Globalization#CA1306;-Microsoft.Globalization#CA1304;-Microsoft.Globalization#CA1305;-Microsoft.Globalization#CA1300;-Microsoft.Performance#CA1811;-Microsoft.Performance#CA1812;-Microsoft.Performance#CA1805</CodeAnalysisRules>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\version.cs">
+      <Link>Properties\version.cs</Link>
+    </Compile>
+    <Compile Include="Algorithms\FsmTraversals.cs" />
+    <Compile Include="Algorithms\GraphIsomorphism.cs" />
+    <Compile Include="Algorithms\GraphTraversals\BasicGraph.cs" />
+    <Compile Include="Algorithms\GraphTraversals\CHPP_N_M_logN.cs" />
+    <Compile Include="Algorithms\GraphTraversals\ClosureOfConnectedComps.cs" />
+    <Compile Include="Algorithms\GraphTraversals\ConnectedComponentDivider.cs" />
+    <Compile Include="Algorithms\GraphTraversals\EulerianTour.cs" />
+    <Compile Include="Algorithms\GraphTraversals\graph.cs" />
+    <Compile Include="Algorithms\GraphTraversals\HSet.cs" />
+    <Compile Include="Algorithms\GraphTraversals\IntBinaryHeapPriorityQueue.cs" />
+    <Compile Include="Algorithms\GraphTraversals\MatchingFSM.cs" />
+    <Compile Include="Algorithms\GraphTraversals\MultipleSourcesShortestPaths.cs" />
+    <Compile Include="Algorithms\GraphTraversals\PriorityQueue.cs" />
+    <Compile Include="Algorithms\GraphTraversals\RBMap.cs" />
+    <Compile Include="Algorithms\GraphTraversals\RBTree.cs" />
+    <Compile Include="Algorithms\GraphTraversals\SingleSourceShortestPaths.cs" />
+    <Compile Include="Algorithms\GraphTraversals\SingleSourceSingleTargetUpperDistSP.cs" />
+    <Compile Include="Algorithms\GraphTraversals\SSMTSP.cs" />
+    <Compile Include="Algorithms\GraphTraversals\StaticStrategies.cs" />
+    <Compile Include="Algorithms\GraphTraversals\StrategyCalculator.cs" />
+    <Compile Include="Algorithms\GraphTraversals\WCBM.cs" />
+    <Compile Include="Algorithms\IEdge.cs" />
+    <Compile Include="Algorithms\IVertex.cs" />
+    <Compile Include="Algorithms\OfflineTestGenerator.cs" />
+    <Compile Include="Algorithms\Path.cs" />
+    <Compile Include="Algorithms\PathNotFoundException.cs" />
+    <Compile Include="Algorithms\PriorityQueue.cs" />
+    <Compile Include="Algorithms\ShortestPathAlgorithms.cs" />
+    <Compile Include="Algorithms\TimedQueue.cs" />
+    <Compile Include="Algorithms\TimedWorker.cs" />
+    <Compile Include="Conformance\ConformanceTester.cs" />
+    <Compile Include="Conformance\ConformanceTesterCommandLine.cs" />
+    <Compile Include="Conformance\ConformanceTesterSettings.cs" />
+    <Compile Include="Conformance\CoveragePointProvider.cs" />
+    <Compile Include="Conformance\IStrategy.cs" />
+    <Compile Include="Conformance\IStepper.cs" />
+    <Compile Include="Conformance\Strategy.cs" />
+    <Compile Include="Conformance\StrategyWithCoverage.cs" />
+    <Compile Include="Conformance\TestResult.cs" />
+    <Compile Include="Conformance\TestSuiteStepper.cs" />
+    <Compile Include="Execution\FSMBuilder.cs" />
+    <Compile Include="Execution\ModelProgramProvider\ActionMethod.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Execution\ModelProgramProvider\ActionMethodFinish.cs" />
+    <Compile Include="Execution\ModelProgramProvider\ActionMethodStart.cs" />
+    <Compile Include="Execution\FsmModelProgram.cs" />
+    <Compile Include="Execution\IModelProgram.cs" />
+    <Compile Include="Execution\IState.cs" />
+    <Compile Include="Execution\ModelProgramProvider\ActionInfo.cs" />
+    <Compile Include="Execution\ModelProgramProvider\EnablingCondition.cs" />
+    <Compile Include="Execution\ModelProgramProvider\Field.cs" />
+    <Compile Include="Execution\ModelProgramProvider\LibraryModelProgram.cs" />
+    <Compile Include="Execution\ModelProgramProvider\Method.cs" />
+    <Compile Include="Execution\ModelProgramProvider\StatePredicate.cs" />
+    <Compile Include="Execution\ModelProgramProvider\StateProperty.cs" />
+    <Compile Include="Execution\ModelProgramUserException.cs" />
+    <Compile Include="Execution\ProductModelProgram.cs" />
+    <Compile Include="Execution\State.cs" />
+    <Compile Include="Execution\TransitionProperties.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Modeling\ArrayEqualityComparer.cs" />
+    <Compile Include="Modeling\Combinatorics.cs" />
+    <Compile Include="Modeling\DataTypes\Bag.cs" />
+    <Compile Include="Modeling\DataTypes\CachedHashCollectionValue.cs" />
+    <Compile Include="Modeling\DataTypes\CollectionValue.cs" />
+    <Compile Include="Modeling\DataTypes\CompoundValue.cs" />
+    <Compile Include="Modeling\DataTypes\FiniteAutomaton.cs" />
+    <Compile Include="Modeling\DataTypes\ICollectionValue.cs" />
+    <Compile Include="Modeling\DataTypes\LabeledInstance.cs" />
+    <Compile Include="Modeling\DataTypes\LobTree.cs" />
+    <Compile Include="Modeling\DataTypes\Map.cs" />
+    <Compile Include="Modeling\DataTypes\OrderedSet.cs" />
+    <Compile Include="Modeling\DataTypes\Pair.cs" />
+    <Compile Include="Modeling\DataTypes\RBTree.cs" />
+    <Compile Include="Modeling\DataTypes\Sequence.cs" />
+    <Compile Include="Modeling\DataTypes\Set.cs" />
+    <Compile Include="Modeling\DataTypes\Triple.cs" />
+    <Compile Include="Modeling\Execute.cs" />
+    <Compile Include="Modeling\HashAlgorithms.cs" />
+    <Compile Include="Modeling\DataTypes\AbstractValue.cs" />
+    <Compile Include="Modeling\Internals\RootedLabeledDirectedGraph.cs" />
+    <Compile Include="Modeling\Internals\InterpretationContext.cs" />
+    <Compile Include="Modeling\Internals\StateContainer.cs" />
+    <Compile Include="Modeling\MessageStrings.cs" />
+    <Compile Include="Modeling\ModelAttributes\AbstractAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\AcceptingStateConditionAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\ActionAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\DomainAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\ExcludeFromState.cs" />
+    <Compile Include="Modeling\ModelAttributes\FeatureAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\RequirementAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\ScenarioAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\SplitAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\StateFilterAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\StateInvariantAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\TransitionPropertyAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\SortAttribute.cs" />
+    <Compile Include="Modeling\NamespaceDoc.cs" />
+    <Compile Include="Modeling\PrettyPrinter.cs" />
+    <Compile Include="Modeling\DataTypes\ValueArray.cs" />
+    <Compile Include="Modeling\Terms\Action.cs" />
+    <Compile Include="Modeling\Terms\Any.cs" />
+    <Compile Include="Modeling\Terms\CompoundTerm.cs" />
+    <Compile Include="Modeling\Terms\Term.cs" />
+    <Compile Include="Modeling\Terms\Literal.cs" />
+    <Compile Include="Modeling\Terms\Symbol.cs" />
+    <Compile Include="Modeling\Terms\TermReader.cs" />
+    <Compile Include="Modeling\Terms\Variable.cs" />
+    <Compile Include="Modeling\WeakCache.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\AssemblyResolver.cs" />
+    <Compile Include="Utilities\CommandLineParser.cs" />
+    <Compile Include="Utilities\DotWriter.cs" />
+    <Compile Include="Utilities\ReflectionHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Modeling.snk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

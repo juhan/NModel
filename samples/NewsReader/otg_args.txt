@@ -1,0 +1,14 @@
+#
+# Referenced assemblies
+#
+/r:bin\\NewsReaderModel.dll
+
+#
+# Factory method that creates an instance of NewsReader model
+#
+NewsReader.Factory.CreateNewsReader
+
+#
+# File where the generated test suite is saved
+#
+/file:Test.txt

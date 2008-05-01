@@ -1,0 +1,1 @@
+FSM(0,AcceptingStates(0),Transitions(t(0,Wait(100),0)))

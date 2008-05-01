@@ -1,0 +1,18 @@
+TestSuite(
+    TestCase(
+        SelectMessages(),
+        SelectTopics(),
+        ShowTitles(),
+        SelectMessages(),
+        SelectTopics(),
+        SortByFirst(),
+        SelectMessages(),
+        SelectTopics(),
+        ShowText(),
+        SelectMessages(),
+        SelectTopics(),
+        ShowTitles(),
+        SortByMostRecent(),
+        ShowText()
+    )
+)

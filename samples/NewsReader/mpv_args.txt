@@ -1,0 +1,9 @@
+#
+# Referenced assemblies
+#
+/r:bin\\NewsReaderModel.dll
+
+#
+# Factory method that creates an instance of NewsReader model
+#
+NewsReader.Factory.CreateNewsReader

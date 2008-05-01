@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="FullBuild">
+  <!--
+  
+  Build script for NModel.
+  - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  
+  To execute:
+    - open a SDK or VS2005 command prompt (needs msbuild in the path)
+    - cd build
+    - msbuild nmodel.build.xml
+    
+    - wait for a while,
+    
+    - nmodel.msi should be produced at the end of the process with AssemblyVersion nr 
+      Version(1, 0, ((((today.Year - 2006) * 100) + today.Month) * 100) + today.Day, 0)
+      AssemblyVersion and AssemblyFileVersion are set to the same value.
+      The build number is the same.
+  
+  -->
+  <UsingTask AssemblyFile="NModel.Tasks.dll" TaskName="NModel.Tasks.CreateAssemblyVersion"/>
+  
+  <!-- project layout -->
+  <PropertyGroup>
+    <SrcRoot>..\src</SrcRoot>
+    <VersionFile>$(SrcRoot)\version.cs</VersionFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(CCNetLabel) != ''">
+    <AssemblyVersion>$(CCNetLabel)</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(CCNetLabel) == ''">
+    <AssemblyVersion>0</AssemblyVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Solution Include="$(SrcRoot)\nmodel.sln" />
+  </ItemGroup>
+
+  <!-- Wix -->
+  <PropertyGroup>
+    <WixDirectory>$(ProgramFiles)\Windows Installer XML v3\bin</WixDirectory>
+    <WixCandle>$(WixDirectory)\candle.exe</WixCandle>
+    <WixLight>$(WixDirectory)\light.exe</WixLight>
+    <WixFiles>main.wxs nmodel.wxs</WixFiles>
+    <WixObjFiles>main.wixobj nmodel.wixobj</WixObjFiles>
+    <!-- to change the bitmaps of the installer: -dWixUIBannerBmp=..\doc\logo\installerbanner.bmp -dWixUIDialogBmp=..\doc\logo\installerdialog.bmp  -->
+    <WixExtensions>-ext WixUIExtension -ext WixNetFxExtension -ext WixVSExtension -ext WixUtilExtension</WixExtensions>
+    <NModelMsi>NModel.msi</NModelMsi>
+  </PropertyGroup>
+
+  <!-- Sandcastle -->
+  <PropertyGroup>
+    <SandcastleDirectory>$(ProgramFiles)\Sandcastle</SandcastleDirectory>
+  </PropertyGroup>
+
+  <!--  
+    Tasks
+  -->
+  <!-- Ensure that the machine is ready to do a build-->
+  <Target Name="VerifyEnvironment">
+    <Message Text="candle: '$(WixCandle)'" />
+    <Error
+      Condition="!Exists('$(WixCandle)')"
+      Text="Wix not installed. Could not fix candle.exe" />
+    <Message Text="light: '$(WixLight)'" />
+    <Error
+      Condition="!Exists('$(WixLight)')"
+      Text="Wix not installed. Could not fix light.exe" />
+    <Message Text="Sandcastle: '$(SandcastleDirectory)'" />
+    <Error
+      Condition="!Exists('$(SandcastleDirectory)')"
+      Text="Sandcastle is not installed, expected to find it at $(SandcastleDirectory)"/>
+  </Target>   
+
+  <!-- build the solution, release-->
+  <Target Name="Build" DependsOnTargets="VerifyEnvironment">
+    <!-- first build NModel.Tasks.dll -->
+    <Exec Command="msbuild NModel.Tasks/NModel.Tasks.csproj" />
+    <CreateAssemblyVersion
+      VersionFile="$(VersionFile)"
+      AssemblyVersion="$(AssemblyVersion)"
+      >
+      <Output TaskParameter="AssemblyVersion" PropertyName="AssemblyVersion" />
+    </CreateAssemblyVersion>
+    <Message Text="Build VersionNumber : $(AssemblyVersion)" />
+    <MSBuild
+      Projects="@(Solution)"
+      Targets="Clean;Build"
+      Properties="Configuration=Debug" />
+  </Target>
+
+  <!-- build the documentation with sandcastle -->
+  <Target Name="Documentation" DependsOnTargets="Build" Condition="true">
+    <Exec Command="buildNModelDocs.bat" />
+  </Target>
+
+  <!-- generates installer with wix -->
+  <Target Name="CreateInstaller" DependsOnTargets="VerifyEnvironment">
+    <!-- wix compilation release -->
+    <Exec Command="&quot;$(WixCandle)&quot; $(WixFiles) $(WixExtensions) -dVersionNumber=$(AssemblyVersion) -dFlavor=Release -dBinDirectory=..\bin" />
+    <Exec Command="&quot;$(WixLight)&quot; -out $(NModelMsi) $(WixObjFiles) $(WixExtensions) -cultures:en-us -dWixUILicenseRtf=license.rtf" />
+  </Target>
+
+  <!-- removes temporary generated files and directories -->
+  <Target Name="Cleanup" DependsOnTargets="CreateInstaller">
+    <Exec Command="del /q *.wixobj"/>
+  </Target>
+
+  <!-- full build, wraps up all the other tasks -->
+  <Target Name="FullBuild" DependsOnTargets="Build;Documentation;CreateInstaller;Cleanup">
+    
+  </Target>
+
+</Project>

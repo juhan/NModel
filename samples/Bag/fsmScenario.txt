@@ -1,0 +1,9 @@
+FSM(0, Acc(0),
+Transitions(
+t(0,Add("a"),0),
+t(0,Add("b"),0),
+t(0,Delete("a"),0),
+t(0,Delete("b"),0),
+t(0,Lookup_Start("a"),0),
+t(0,Lookup_Start("b"),0),
+t(0,Count_Start(),0)))

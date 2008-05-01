@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+See http://www.tramontana.co.hu/wix/ for a good tutorial
+on Wix.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product
+    Id="{AFA2D98B-C755-46da-B846-DC38CB948BD3}"
+    Name="NModel $(var.VersionNumber) $(var.Flavor)"
+    Language="1033"
+    Version="$(var.VersionNumber)"
+    Manufacturer="NModel"
+    UpgradeCode="{AEC1D60B-A4B6-433e-B480-B5D11753A854}">
+    <Package
+      InstallerVersion="200"
+      Compressed="yes"
+      InstallPrivileges="elevated"
+      Manufacturer="Microsoft" />
+
+    <!-- This property defines the ALLUSERS property to be 1, which indicates that this product will be  -->
+    <!-- installed per-machine instead of per-user.                                                      -->
+    <Property Id="ALLUSERS">
+      <![CDATA[0]]>
+    </Property>
+    <!-- application home page -->
+    <Property Id="ARPURLINFOABOUT" Value="http://www.codeplex.com/nmodel" />
+    <!-- technical help link -->
+    <Property Id="ARPHELPLINK" Value="http://www.codeplex.com/nmodel" />
+    <!-- shortcut to homepage -->
+    <Property Id="MODELING_HOMEPAGE" Value="http://www.codeplex.com/nmodel" />
+    <Media Id="1" Cabinet="Product.cab" EmbedCab="yes" />
+
+    <!-- directory structure -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLLOCATION" Name="NModel">
+          <!-- registry key to specify the install location -->
+          <Component
+              Id="NModelPathRegistryKeyComponent"
+              Guid="{9D89C3C5-7943-431c-A669-AD4EE8D054E1}">
+            <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft" Action="none">
+              <RegistryKey Key="NModel" Action="createAndRemoveOnUninstall">
+                <RegistryKey Key="CurrentVersion" Action="createAndRemoveOnUninstall">
+                  <RegistryKey Key="InstallPath" Action="createAndRemoveOnUninstall">
+                    <RegistryValue Type="string" Value="[INSTALLLOCATION]" />
+                  </RegistryKey>
+                </RegistryKey>
+              </RegistryKey>
+            </RegistryKey>
+            <CreateFolder />
+          </Component>
+          <Directory Id="INSTALLBINLOCATION" Name="bin"/>
+          <Directory Id="INSTALLDOCLOCATION" Name="Documentation" />
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ProgramMenuDir" Name="NModel">
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Feature
+      Id="ProductFeature"
+      Title="NModel $(var.VersionNumber)"
+      Level="1"
+      Description="Program Exploration Framework v[BuildNumber]"
+      Display="expand"
+      ConfigurableDirectory="INSTALLLOCATION" >
+      <ComponentRef Id="NModelPathRegistryKeyComponent" Primary="yes"/>
+      <ComponentRef Id="NModelHomePageComponent" Primary="yes"/>
+      <FeatureRef Id="NModelFeature" />
+    </Feature>
+
+    <!-- shortcuts -->
+    <DirectoryRef Id="INSTALLLOCATION">
+      <Component
+        Id="NModelHomePageComponent"
+        Guid="{F4630327-D9F5-48e0-B79B-E5B656D27D8E}">
+        <RegistryKey Root="HKCU" Key="NModel" Action="none">
+          <RegistryKey Key="NModel" Id="HomePageShortCutId" Action="createAndRemoveOnUninstall">
+            <RegistryValue Type="string" KeyPath="yes" Name="HomePage" Value="[MODELING_HOMEPAGE]" />
+          </RegistryKey>
+        </RegistryKey>
+        <Shortcut Id="HomePageShortcut"
+                  Directory="ProgramMenuDir"
+                  Name="Home Page"
+                  Target="[MODELING_HOMEPAGE]"
+                  />
+        <CreateFolder Directory="INSTALLLOCATION" />
+        <RemoveFolder Id="RemoveHomePageId" Directory="ProgramMenuDir" On="uninstall"/>
+        <RemoveFolder Id="RemoveNModel" Directory="INSTALLLOCATION" On="both"/>
+      </Component>
+    </DirectoryRef>
+
+    <!-- Installation Prequisites -->
+    <!-- admin only -->
+   <!-- <Condition Message="You need to be an administrator to install this product.">
+      Privileged
+    </Condition> -->
+    <!-- requires .net 2.0 -->
+    <PropertyRef Id="NETFRAMEWORK20"/>
+    <Condition Message="The .NET Framework 2.0 must be installed">
+      Installed OR NETFRAMEWORK20
+    </Condition>
+    <!-- built in UI -->
+    <UI>
+      <UIRef Id="WixUI_Mondo" />
+      <UIRef Id="WixUI_ErrorProgressText" />
+    </UI>
+  </Product>
+</Wix>

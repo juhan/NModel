@@ -1,0 +1,9 @@
+## Referenced assemblies
+/r:bin\\NewsReaderImpl.dll
+
+## Implementation under test
+/iut:NewsReader.Impl.Stepper.Make
+
+#
+# Test suite
+/testSuite:Test.txt

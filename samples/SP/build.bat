@@ -1,0 +1,1 @@
+msbuild SP.sln && rmdir /S /Q SPImpl\obj && rmdir /S /Q SPModel\obj"

@@ -1,0 +1,10 @@
+FSM(0, AcceptingStates(3), Transitions(
+    t(0, a(), 0),
+    t(0, b(), 0),
+    t(0, a(), 1),
+    t(1, a(), 2),
+    t(1, b(), 2),
+    t(2, a(), 3),
+    t(2, b(), 3)
+  )
+)

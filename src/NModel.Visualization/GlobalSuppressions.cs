@@ -1,0 +1,4 @@
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "System.ComponentModel")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", Scope = "member", Target = "Microsoft.Modeling.Visualization.Utilities.SequenceViewer..ctor(System.String,Microsoft.Modeling.Terms.CompoundTerm)", MessageId = "System.Int32.ToString(System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", Scope = "member", Target = "NModel.Visualization.SequenceViewer..ctor(System.String,NModel.Terms.CompoundTerm)", MessageId = "System.Int32.ToString(System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "GraphLayout.Set`1")]

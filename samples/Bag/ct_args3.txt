@@ -1,0 +1,50 @@
+#--------------------------
+# Sample settings for ct
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\BagModel.dll
+/r:bin\\BagImpl.dll
+
+#
+# Factory method of the model that the implementation must conform to
+#
+BagWithProbe.Factory.Create
+ProbeUsage.Factory.Create
+/fsm:fsmScenario.txt
+
+
+#
+# Factory method of the stepper interface to the implementation under test
+#
+/iut:BagImpl.Stepper.Create
+
+#
+# Number of runs and desired number of steps per run
+#
+/runs:3
+/steps:15
+
+#
+# Timeout
+#
+/timeout:10000
+
+#
+# Actions that are only observed (not controlled) by the tester
+#
+/o:Lookup_Finish
+/o:Count_Finish
+
+#
+# Cleanup actions
+#
+/c:Delete
+
+#
+# Store test runs in this file
+#
+#/log:testruns.txt
+

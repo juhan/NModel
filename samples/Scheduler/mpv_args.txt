@@ -1,0 +1,24 @@
+#--------------------------
+# Sample settings for mpv
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\SchedulerModel.dll
+
+#
+# Factory method of the model program that is being viewed
+#
+Counting.Factory.Create
+Triggering.Factory.Create
+Timing.Factory.Create
+
+#
+# Viewer settings
+#
+/combineActions-
+/acceptingStatesMarked-
+/stateShape:Circle
+/maxTransitions:200
+#/initialTransitions:20

@@ -1,0 +1,1 @@
+msbuild Bag.sln && rmdir /S /Q BagImpl\obj && rmdir /S /Q BagModel\obj"

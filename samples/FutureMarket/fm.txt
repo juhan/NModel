@@ -1,0 +1,32 @@
+# --- Assemblies ---
+/r:bin\\FM.dll
+
+# --- Models ---
+FM.Factory.CreateScenario
+
+# --- Analysis ---
+/livenessCheckIsOn-
+/safetyCheckIsOn-
+/deadStatesVisible
+/deadStateColor:Yellow
+
+# --- Exploration limits ---
+/initialTransitions:-1
+/maxTransitions:50
+
+# --- States ---
+/nodeLabelsVisible
+/acceptingStatesMarked-
+/stateShape:Ellipse
+/initialStateColor:LightGray
+
+# --- Transitions ---
+/transitionLabels:None
+/loopsVisible-
+/combineActions
+/mergeLabels-
+
+# --- Graph ---
+/hoverColor:Lime
+/selectionColor:Blue
+/direction:TopToBottom

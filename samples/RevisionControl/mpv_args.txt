@@ -1,0 +1,5 @@
+# referenced assemblies
+/r:bin\\RevisionControl.dll
+
+#model program
+RevisionControl.Factory.CreateScenario1

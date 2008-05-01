@@ -1,0 +1,1 @@
+msbuild && rmdir /S /Q RobotImpl\obj && rmdir /S /Q RobotModel\obj"

@@ -1,0 +1,22 @@
+TestSuite(
+    TestCase(
+        Delete("a"),
+        Add("a"),
+        Add("a"),
+        Delete("b"),
+        Delete("a"),
+        Delete("a"),
+        Delete("b"),
+        Add("b"),
+        Add("a"),
+        Delete("b"),
+        Delete("b"),
+        Add("b"),
+        Delete("a"),
+        Add("b"),
+        Delete("a"),
+        Delete("b"),
+        Delete("a"),
+        Delete("b")
+    )
+)

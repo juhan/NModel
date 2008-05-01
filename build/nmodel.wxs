@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+See http://www.tramontana.co.hu/wix/ for a good tutorial
+on Wix.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <Feature
+      Id="NModelFeature"
+      Title="NModel Framework"
+      Level="1">
+      <ComponentGroupRef Id="NModelComponentGroup" Primary="yes"/>
+    </Feature>
+    
+    <ComponentGroup Id="NModelComponentGroup">
+      <ComponentRef Id="NModelCoreComponent" Primary="yes"/>
+      <ComponentRef Id="NModelSymbolsComponent" Primary="yes"/>
+      <ComponentRef Id="NModelVisualizationComponent" Primary="yes"/>
+      <ComponentRef Id="NModelVisualizationSymbolsComponent" Primary="yes"/>
+      <ComponentRef Id="NModelFsm2DotComponent" Primary="yes"/>
+      <ComponentRef Id="NModelMpvComponent" Primary="yes"/>
+      <ComponentRef Id="NModelCtComponent" Primary="yes"/>
+      <ComponentRef Id="NModelOtgComponent" Primary="yes"/>
+      <ComponentRef Id="NModelXmlDocsComponent" Primary="yes"/>
+      <ComponentRef Id="NModelDocumentationComponent" Primary="yes"/>
+      <ComponentRef Id="NModelAssemblyFolderKey" Primary="yes"/>
+    </ComponentGroup>
+
+    <!-- documentation -->
+    <DirectoryRef Id="INSTALLDOCLOCATION">
+      <Component
+        Id="NModelDocumentationComponent"
+        Guid="{2C117BEF-4D17-471f-8D85-11DE5DF9AB96}">
+        <File Id="NModelDocumentationChm" Source="NModel.chm" Name="NModel.chm" KeyPath="yes" />
+        <Shortcut Show="normal"
+                  Id="NModelDocumentationShortCut"
+                  Directory="ProgramMenuDir"
+                  Name="NModel Documentation"
+                  Advertise="yes"
+                  />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="INSTALLBINLOCATION">
+      <Component
+          Id="NModelCoreComponent"
+          Guid="{2EAB86AB-BA1A-463c-AA23-649F45D94327}">
+        <File Id="NModelDll" DiskId="1" Source="$(var.BinDirectory)\NModel.dll" Name="NModel.dll" Vital="yes" KeyPath="yes" />
+      </Component>
+      <Component
+         Id="NModelSymbolsComponent"
+         Guid="{526C83F1-346F-45de-9FD7-515DEBF7B5FB}">
+        <File Id="NModelpdb" DiskId="1" Source="$(var.BinDirectory)\NModel.pdb" Name="NModel.pdb" />
+      </Component>
+      <Component
+        Id="NModelXmlDocsComponent"
+        Guid="{3B9D6C3A-F0E4-42e6-BC88-5AA1EA6917AB}">
+        <File Id="NModelxml" DiskId="1" Source="$(var.BinDirectory)\NModel.xml" Name="NModel.xml" />
+      </Component>
+
+      <Component
+          Id="NModelVisualizationComponent"
+          Guid="{9BB8E749-0EE0-4989-801F-77FA11123277}">
+        <File Id="NModelVisualizationDll" DiskId="1" Source="$(var.BinDirectory)\NModel.Visualization.dll" Name="NModel.Visualization.dll" Vital="yes" KeyPath="yes" />
+      </Component>
+      <Component
+         Id="NModelVisualizationSymbolsComponent"
+         Guid="{9BDC9DE3-DC38-47ff-AB2B-4A510FFA7CC1}">
+        <File Id="NModelVisualizationpdb" DiskId="1" Source="$(var.BinDirectory)\NModel.Visualization.pdb" Name="NModel.Visualization.pdb" />
+      </Component>
+
+      <Component
+         Id="NModelFsm2DotComponent"
+        Guid="{33568A97-96A0-4273-8917-1C7DCD2635CD}">
+        <File Id="fsm2dotExe" DiskId="1" Source="$(var.BinDirectory)\fsm2dot.exe" Name="fsm2dot.exe" Vital="yes" />
+      </Component>
+
+      <Component
+         Id="NModelMpvComponent"
+        Guid="{1B71F859-7E5E-48a7-A1B9-28207DAEF008}">
+        <File Id="MpvExe" DiskId="1" Source="$(var.BinDirectory)\mpv.exe" Name="mpv.exe" Vital="yes" />
+      </Component>
+      <Component
+          Id="NModelCtComponent"
+          Guid="{615DB02E-3AE7-47f7-8565-8A21893E5CAC}">
+          <File Id="CtExe" DiskId="1" Source="$(var.BinDirectory)\ct.exe" Name="ct.exe" Vital="yes" />
+      </Component>
+      <Component
+          Id="NModelOtgComponent"
+          Guid="{A8569382-380F-479f-BE0E-0AEDD2444294}">
+          <File Id="OtgExe" DiskId="1" Source="$(var.BinDirectory)\otg.exe" Name="otg.exe" Vital="yes" />
+      </Component>
+      <!-- reg key so that the assembly shows up in the Add/Remove references
+      in VS
+      -->
+      <Component Id="NModelAssemblyFolderKey"
+                 Guid="{AE8AEC1E-17EC-42f6-98BE-65D26938B281}">
+        <RegistryKey
+          Root="HKLM"
+          Key="SOFTWARE\Microsoft\.NETFramework\AssemblyFolders">
+          <RegistryKey
+            Id="NModelAssemblyFolderKey"
+            Key="NModel"
+            Action="createAndRemoveOnUninstall">
+            <RegistryValue
+               Action="write"
+               Type="string"
+               Value="[INSTALLBINLOCATION]" />
+          </RegistryKey>
+        </RegistryKey>
+        <CreateFolder />
+      </Component>
+    </DirectoryRef>    
+  </Fragment>
+</Wix>

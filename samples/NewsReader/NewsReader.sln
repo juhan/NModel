@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsReaderModel", "Model\NewsReaderModel.csproj", "{7DCD3641-4C91-4B50-A48E-8ECB26B69D0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewsReaderImpl", "Impl\NewsReaderImpl.csproj", "{B94B0320-7425-4EBB-B10D-4A51929CA547}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DCD3641-4C91-4B50-A48E-8ECB26B69D0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DCD3641-4C91-4B50-A48E-8ECB26B69D0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DCD3641-4C91-4B50-A48E-8ECB26B69D0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DCD3641-4C91-4B50-A48E-8ECB26B69D0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B94B0320-7425-4EBB-B10D-4A51929CA547}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B94B0320-7425-4EBB-B10D-4A51929CA547}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B94B0320-7425-4EBB-B10D-4A51929CA547}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B94B0320-7425-4EBB-B10D-4A51929CA547}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

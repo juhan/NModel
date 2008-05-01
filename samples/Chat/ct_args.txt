@@ -1,0 +1,49 @@
+#--------------------------
+# Sample settings for ct
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:Chat.Model.dll
+/r:Chat.TestHarness.dll
+
+#
+# Factory method of the model that the implementation must conform to
+#
+Chat.Model.Contract.Make
+Chat.Scenario.ChatScenario.Make
+/fsm:wait.txt
+
+#
+# Factory method of the stepper interface to the mplementation under test
+#
+/iut:Chat.TestHarness.ChatStepper.Create
+
+#
+# Number of runs and number of steps per run
+#
+/runs:2
+/steps:30
+
+#
+# Timeouts
+# timeout of controllables 1 min
+/timeout:6000000
+
+#
+# Actions that are observed (not controlled) by the tester
+#
+/o:Setup_Finish
+/o:Receive
+
+#
+# Store test runs in this file
+#
+#/log:testruns.txt
+
+#
+# Terminate testing after the first failure
+#
+/continueOnFailure-
+

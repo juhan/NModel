@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyCoffeeMachineModel", "Model\EmptyCoffeeMachineModel.csproj", "{3FCB2992-69BD-45B1-A053-1377812F38FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyCoffeeMachineImpl", "Impl\EmptyCoffeeMachineImpl.csproj", "{5E415E53-1CE0-44DA-AFBD-F5153B8C81DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FCB2992-69BD-45B1-A053-1377812F38FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FCB2992-69BD-45B1-A053-1377812F38FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FCB2992-69BD-45B1-A053-1377812F38FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FCB2992-69BD-45B1-A053-1377812F38FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E415E53-1CE0-44DA-AFBD-F5153B8C81DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E415E53-1CE0-44DA-AFBD-F5153B8C81DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E415E53-1CE0-44DA-AFBD-F5153B8C81DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E415E53-1CE0-44DA-AFBD-F5153B8C81DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

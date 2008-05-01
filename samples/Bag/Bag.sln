@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BagImpl", "BagImpl\BagImpl.csproj", "{2779F29C-0219-4516-9648-2BF2EFA97158}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BagModel", "BagModel\BagModel.csproj", "{AF4E51F4-7F26-4CBB-81DB-5EA62A4501E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2779F29C-0219-4516-9648-2BF2EFA97158}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2779F29C-0219-4516-9648-2BF2EFA97158}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2779F29C-0219-4516-9648-2BF2EFA97158}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2779F29C-0219-4516-9648-2BF2EFA97158}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF4E51F4-7F26-4CBB-81DB-5EA62A4501E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF4E51F4-7F26-4CBB-81DB-5EA62A4501E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF4E51F4-7F26-4CBB-81DB-5EA62A4501E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF4E51F4-7F26-4CBB-81DB-5EA62A4501E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

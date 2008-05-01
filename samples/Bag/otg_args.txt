@@ -1,0 +1,18 @@
+#--------------------------
+# Sample settings for otg
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\BagModel.dll
+
+#
+# Factory method of the model program
+#
+BagModel.Factory.CreateScenario2
+
+#
+# Generated test suite
+# 
+/file:testSuite.txt

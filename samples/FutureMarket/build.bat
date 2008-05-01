@@ -1,0 +1,1 @@
+msbuild && rmdir /S /Q FM\obj"

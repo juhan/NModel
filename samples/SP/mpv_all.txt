@@ -1,0 +1,10 @@
+# references:
+/r:bin\\SP.dll 
+
+# model programs:
+SP.CreditScenario.Create
+SP.CancelScenario.Create
+SP.Factory.CreateCommands
+SP.Factory.CreateSetup
+
+

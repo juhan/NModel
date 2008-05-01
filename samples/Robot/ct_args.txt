@@ -1,0 +1,52 @@
+#--------------------------
+# Sample settings for ct
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\RobotModel.dll
+/r:bin\\RobotImpl.dll
+
+# strategy
+/modelStepper:NModel.Conformance.StrategyWithCoverage.CreateWithProbableReward
+#/modelStepper:MDPAlgos.MDPNewStrategy.CreateMDPNewStrategy
+#/modelStepper:MDPAlgos.MDPNewAbstractStrategy.CreateMDPNewAbstractStrategy
+#/modelStepper:MDPAlgos.MDPStrategy.CreateMDPStrategy
+#
+# Factory method of the model that the implementation must conform to
+#
+RobotModel1.Factory.Create
+
+#
+# Factory method of the stepper interface to the mplementation under test
+#
+/iut:RobotImpl1.Stepper.Create
+
+#
+# Number of runs and number of steps per run
+#
+/runs:3
+/steps:20
+
+#
+# Timeouts
+#
+/timeout:1000
+#/wait:1000
+
+#
+# Actions that are observed (not controlled) by the tester
+#
+
+/o:Recharge
+#
+# Cleanup actions
+#
+
+
+#
+# Store test runs in this file
+#
+#/log:testruns.txt
+

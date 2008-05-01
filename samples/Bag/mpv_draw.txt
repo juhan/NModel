@@ -1,0 +1,22 @@
+#--------------------------
+# Sample settings for mpv
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\BagModel.dll
+
+#
+# Factory method of the model program that is being viewed
+#
+BagModel.Draw.Make
+/fsm:drawScenario.txt
+
+#
+# Viewer settings
+#
+/combineActions+
+/acceptingStatesMarked-
+/stateShape:Circle
+/maxTransitions:20

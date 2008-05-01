@@ -1,0 +1,3 @@
+FSM(0, AcceptingStates(0),
+    Transitions(t(0,Cancel(2),0), t(0,ReqSetup(2),0), t(0,ResSetup(2),0)),
+    Vocabulary("ResWork", "ReqWork"))

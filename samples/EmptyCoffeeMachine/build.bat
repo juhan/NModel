@@ -1,0 +1,1 @@
+msbuild &&  rmdir /S /Q Impl\obj && rmdir /S /Q Model\obj"

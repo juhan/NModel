@@ -1,0 +1,18 @@
+#references  
+/r:bin\\SPImpl.dll 
+/r:bin\\SP.dll 
+
+#model program
+SP.OTFTest.Make 
+#fsm for the wait action
+/fsm:wait.txt
+
+#implementation stepper
+/iut:SPImpl.Stepper.Make
+  
+#observable actions
+/o:ResWork /o:ResSetup
+
+#do not continue on failure
+/continueOnFailure-
+

@@ -1,0 +1,22 @@
+#--------------------------
+# Sample settings for mpv
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:Chat.Model.dll
+
+#
+# Factory method of the model programs whose product is being viewed
+#
+Chat.Model.Contract.Make
+Chat.Scenario.ChatScenario.Make
+
+#
+# Viewer settings
+#
+/acceptingStatesMarked-
+/stateShape:Circle
+/transitionLabels:ActionSymbol
+

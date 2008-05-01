@@ -1,0 +1,7 @@
+# references:
+/r:bin\\SP.dll 
+
+# model programs:
+SP.Factory.CreateCancellation
+/fsm:CancellationScenario2.txt
+

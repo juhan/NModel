@@ -1,0 +1,24 @@
+#--------------------------
+# Sample settings for mpv
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\RobotModel.dll
+
+#
+# Factory method of the model program that is being viewed
+#
+#SchedulerModel.Factory.Create
+#SchedulerModel.Factory.CreateExtend
+RobotModel1.Factory.Create
+#SchedulerScenario.InitScenario.CreateScenario
+#
+# Viewer settings
+#
+/combineActions-
+/acceptingStatesMarked-
+/stateShape:Circle
+/maxTransitions:200
+/initialTransitions:10
