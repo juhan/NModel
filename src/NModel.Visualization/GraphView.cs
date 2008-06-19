@@ -1384,6 +1384,24 @@ namespace NModel.Visualization
             return new GraphLayout.Drawing.Color(c.R, c.G, c.B);
         }
 
+        // So we can write our own alternative to ToGleeColor
+        struct DotColor
+        {
+            byte R, G, B; 
+            // must declare both public 
+            public DotColor(byte r, byte g, byte b) { R = r; B = b; G = g; }
+            public override string ToString()
+            {
+                // return "white"; // stub
+                return String.Format("\"#{0:x2}{1:x2}{2:x2}\"", R, G, B);
+            }
+        }
+
+        static DotColor ToDotColor(Color c)
+        {
+            return new DotColor(c.R, c.G, c.B);
+        }
+
         //GraphLayout.Drawing.Color black = new GraphLayout.Drawing.Color(Color.Black.R, Color.Black.G, Color.Black.B);
         object previouslyHoveredObject;
         GraphLayout.Drawing.Color previouslyHoveredObjectColor = new GraphLayout.Drawing.Color(Color.Black.R, Color.Black.G, Color.Black.B);
@@ -1944,7 +1962,7 @@ namespace NModel.Visualization
             sb.Append("[style = filled, shape = ");
             sb.Append(ToDotShape(this.stateShape));
             sb.Append(", peripheries = 1, fillcolor = ");
-            sb.Append(ToGleeColor(this.deadStateColor).ToString());
+            sb.Append(ToDotColor(this.deadStateColor).ToString());
             sb.Append("]");
         }
 
@@ -1953,7 +1971,7 @@ namespace NModel.Visualization
             sb.Append("[style = filled, shape = ");
             sb.Append(ToDotShape(this.stateShape));
             sb.Append(", peripheries = 1, fillcolor = ");
-            sb.Append(ToGleeColor(this.unsafeStateColor).ToString());
+            sb.Append(ToDotColor(this.unsafeStateColor).ToString());
             sb.Append("]");
         }
 
@@ -1974,7 +1992,7 @@ namespace NModel.Visualization
             else
                 sb.Append("1");
             sb.Append(", fillcolor = ");
-            sb.Append(ToGleeColor(this.initialStateColor).ToString());
+            sb.Append(ToDotColor(this.initialStateColor).ToString());
             sb.Append("]");
         }
 
