@@ -1,0 +1,58 @@
+Model Program to Dot
+
+mp2dot is a substitute or replacement for mpv (model program viewer)
+that does not depend on GLEE.  It does not even depend on
+Windows.Forms, so it should build and run on non-Windows
+implementations of the CLI such as Mono.
+
+mp2dot is a command-line program with no graphical user interface.  It
+produces an output file in the dot language which must be processed by
+other programs, such as dot and GSview, to produce graphic output.
+
+mp2dot accepts all the same command line options as mpv, so it can
+accept exiting mpv response files.
+
+In addition to all the mpv options, mp2dot supports two more:
+/dotFileName and /machineFileName.  These two options achieve the same
+effect as the Save as Dot... and Save as FSM... options in the mpv GUI
+(from the Save as image... toolbar menu).  If the option is absent,
+that file is not written.
+
+mp2dot writes exploration statistics to the console, even when
+no output files are requested, as in this example:
+
+C:\NModel\mp2dot\bin>mp2dot @mpv_safety_liveness.txt
+  121 states
+  239 transitions
+    2 accepting states
+   61 dead states
+    4 unsafe states
+
+
+Options
+
+[/dotFileName:<string>]
+File where the dot output is saved. If this option is absent, no dot
+output is written.  (Short form: /dot)
+
+[/machineFileName:<string>] 
+File where the FSM is saved.  If this option is absent, no FSM
+output is written.  (Short form: /machine)
+
+
+Release notes (for change set of 17 Aug 2008)
+
+To add mp2dot, these new source files are added to the NModel distribution:
+
+src/Mp2Dot/Program.cs
+
+src/NModel/Utilities/Mp2DotCommandLine.cs, Mp2DotGraphView.cs, 
+and Mp2DotGraphView.Settings.cs 
+
+The Visual Studio .sln and .csproj files have not been changed in this
+change set, so the new files are not included in the projects and are
+not included in the build.  You must add the files to the projects
+yourself in order to build mp2dot.exe.
+
+Some mpv options have no effect in this version of mp2dot: 
+/combineActions+   /loopsVisible-  /mergeLabels+
