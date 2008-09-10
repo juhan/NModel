@@ -40,19 +40,26 @@ File where the FSM is saved.  If this option is absent, no FSM
 output is written.  (Short form: /machine)
 
 
-Release notes (for change set of 17 Aug 2008)
+Release notes (for change set of 9 Sep 2008)
+
+Some mpv options have no effect in this version of mp2dot: 
+/combineActions+   /loopsVisible-  /mergeLabels+
 
 To add mp2dot, these new source files are added to the NModel distribution:
 
 src/Mp2Dot/Program.cs
 
+src/Mp2Dot/Mp2Dot.txt (this file)
+
 src/NModel/Utilities/Mp2DotCommandLine.cs, Mp2DotGraphView.cs, 
 and Mp2DotGraphView.Settings.cs 
 
-The Visual Studio .sln and .csproj files have not been changed in this
-change set, so the new files are not included in the projects and are
-not included in the build.  You must add the files to the projects
-yourself in order to build mp2dot.exe.
+The Visual Studio .sln and .csproj files have also been revised in this change set,
+so mp2dot.exe can be built.
 
-Some mpv options have no effect in this version of mp2dot: 
-/combineActions+   /loopsVisible-  /mergeLabels+
+The new files Mp2DotCommandLine.cs, Mp2DotGraphView.cs, and Mp2DotGraphView.Settings.cs 
+are based on ModelProgramViewerCommandLines.cs, GraphView.cs, and GraphView.Settings.cs
+in NModel.Visualization.  The code in the new files is in the NModel.Utilities.Graph
+namespace so type names do not clash.  In this release the mp2dot functionality is provided 
+by simply adding the new source files; there are no changes in any of the existing source
+files.  As a result, there is much duplicated code in the new files.

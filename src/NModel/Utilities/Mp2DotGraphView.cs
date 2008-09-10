@@ -1,6 +1,3 @@
-//-------------------------------------
-// Copyright (c) Microsoft Corporation
-//-------------------------------------
 using System;
 using System.Text;
 // using System.Drawing; // keep or remove?

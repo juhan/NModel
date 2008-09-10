@@ -1,6 +1,3 @@
-//-------------------------------------
-// Copyright (c) Microsoft Corporation
-//-------------------------------------
 using System;
 using System.IO;
 using System.Collections.Generic;
