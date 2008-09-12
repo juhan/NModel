@@ -164,6 +164,9 @@
     <Compile Include="Utilities\AssemblyResolver.cs" />
     <Compile Include="Utilities\CommandLineParser.cs" />
     <Compile Include="Utilities\DotWriter.cs" />
+    <Compile Include="Utilities\Mp2DotCommandLine.cs" />
+    <Compile Include="Utilities\Mp2DotGraphView.cs" />
+    <Compile Include="Utilities\Mp2DotGraphView.Settings.cs" />
     <Compile Include="Utilities\ReflectionHelper.cs" />
   </ItemGroup>
   <ItemGroup>
