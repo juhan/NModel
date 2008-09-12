@@ -360,7 +360,7 @@ namespace NModel.Conformance
         [Argument(ArgumentType.LastOccurenceWins, ShortName = "", DefaultValue = 0, HelpText = "The desired number of steps that a single test run should have. After the number is reached, only cleanup tester actions are used and the test run continues until an accepting state is reached or the number of steps is MaxSteps (whichever occurs first). 0 implies no bound and a test case is executed until either a conformance failure occurs or no more actions are enabled. (If a testSuite is provided, this value is set to 0.)")]
         public int steps;
 
-        [Argument(ArgumentType.LastOccurenceWins, ShortName = "", DefaultValue = 0, HelpText = "The maximum number of steps that a single test run can have. This value must be either 0, which means that there is no bound, or greater than or equal to steps.")]
+        [Argument(ArgumentType.LastOccurenceWins, ShortName = "", DefaultValue = 0, HelpText = "The maximum number of steps that a single test run can have. This value must be either 0, which means that there is no bound, or greater than or equal to steps. Steps is assigned the value of maxsteps if not explicitly set to a lower value.")]
         public int maxSteps;
 
         [Argument(ArgumentType.LastOccurenceWins, ShortName = "", DefaultValue = 0, HelpText = "The desired number of test runs. Testing stops when this number has been reached. Negative value or 0 implies no bound. (If a testSuite is provided, this value is set to the number of test cases in the test suite.)")]

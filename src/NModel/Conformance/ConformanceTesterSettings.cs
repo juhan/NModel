@@ -130,6 +130,7 @@ namespace NModel.Conformance
         int maxStepsCnt = 0;
         /// <summary>
         /// The maximum number of steps that a single test run can have. This value must be 0, which means that there is no bound, or greater than or equal to stepsCnt.
+        /// If stepsCnt is 0 then stepsCnt is set to be equal to maxStepsCnt.
         /// </summary>
         public int MaxStepsCnt
         {
@@ -141,6 +142,8 @@ namespace NModel.Conformance
             {
                 if (value != 0 && value < stepsCnt)
                     throw new ConformanceTesterException("The maximum number of steps in a run cannot be less than the desired number of steps in a run.");
+                if (stepsCnt == 0)
+                    stepsCnt = value;
                 maxStepsCnt = value;
             }
         }
