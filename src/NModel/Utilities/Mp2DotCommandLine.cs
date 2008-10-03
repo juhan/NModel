@@ -219,7 +219,7 @@ namespace NModel.Utilities.Graph
             form.View.DeadstatesVisible = settings.deadStatesVisible;
 
             form.View.SetModelProgram(mp);
-            form.View.finiteAutomatonContext.CollectUnsafeNodes();
+            form.View.graphWorker();
             form.View.WriteExplorationStatistics();
 
             if (!String.IsNullOrEmpty(settings.dotFileName))

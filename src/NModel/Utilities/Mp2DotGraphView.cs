@@ -544,22 +544,7 @@ namespace NModel.Utilities.Graph
                 this.unsafeNodes = Set<Node>.EmptySet;
                 this.groupingTransitions = Set<Transition>.EmptySet;
             }
-
-
-            // This was a block of code in GraphView.ToDot, move here because it assigns unsafeNodes
-            internal void CollectUnsafeNodes()
-            {
-                foreach (Node node in fa.States)
-                {
-                    IState istate = stateProvider(node);
-                    if (!mp.SatisfiesStateInvariant(istate))
-                    {
-                        unsafeNodes = unsafeNodes.Add(node);
-                    }
-                }
-            }
         }
-
 
         /// <summary>
         /// Represents info about the original (top-level) FA
@@ -681,8 +666,538 @@ namespace NModel.Utilities.Graph
             }
         }
 
-        // members removed
+        static bool IsStartAction(Term action)
+        {
+            CompoundTerm a = action as CompoundTerm;
+            if (a == null) return false;
+            // return Symbol.Kind(a.FunctionSymbol1) == ActionKind.Start;
+            return a.Symbol.Name.EndsWith("_Start");
+        }
 
+        static bool IsFinishAction(Term action)
+        {
+            CompoundTerm a = action as CompoundTerm;
+            if (a == null) return false;
+            // return Symbol.Kind(a.FunctionSymbol1) == ActionKind.Finish ;
+            return a.Symbol.Name.EndsWith("_Finish");
+        }
+
+        static bool IsFinishAction(Term action, string name)
+        {
+            CompoundTerm a = action as CompoundTerm;
+            if (a == null) return false;
+            return IsFinishAction(action) && a.Symbol.Name == name + "_Finish";
+        }
+
+        static bool AllTransitionsAreFinish(string actionName, List<Transition> transitions)
+        {
+            foreach (Transition t in transitions)
+                if (!IsFinishAction(t.Second, actionName))
+                    return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Dictionary of nodes to be drawn by dot, after preprocessing by graphWorker.
+        /// Based on nodes in NModel.Visualization GraphView
+        /// Key of dictionary here is just incrementing integers
+        /// NO THAT DIDN'T WORK - got duplicate values.  
+        /// So let's use *same* item for both key and value
+        /// Use Dictionary not Set because MultiLabeledTransition (below) is apparently not IComparable
+        /// </summary>
+        // internal Dictionary<GraphLayout.Drawing.Node, Node> nodes = new Dictionary<GraphLayout.Drawing.Node, Node>();
+        // internal Set<Node> nodes = new Set<Node>();  
+        // internal Dictionary<int, Node> nodes = new Dictionary<int, Node>();
+        internal Dictionary<Node, Node> nodes = new Dictionary<Node, Node>();
+
+        /// <summary>
+        /// Dictionary of transitions to be drawn by dot, after preprocessing by graphWorker.
+        /// Based transitions in NModel.Visualization GraphView
+        /// Key of dictionary here is just incrementing integers
+        /// Use Dictionary not Set because MultiLabeledTransition (below) is apparently not IComparable
+        /// </summary>
+        // private Dictionary<GraphLayout.Drawing.Edge, MultiLabeledTransition> transitions = new Dictionary<GraphLayout.Drawing.Edge, MultiLabeledTransition>(); 
+        // private Set<MultiLabeledTransition> transitions = new Set<MultiLabeledTransition>();
+        private Dictionary<int, MultiLabeledTransition> transitions = new Dictionary<int, MultiLabeledTransition>();
+
+        /// <summary>
+        /// Pre-process graph data before calling ToDot
+        /// Reads data in finiteAutomatonContext, writes the two sets nodes and transitions
+        /// Based on NModel.Visualization GraphView graphWorker_DoWork
+        /// Comment out all uses of GLEE, events, and threads
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+        // private void graphWorker_DoWork(object/*?*/ sender, DoWorkEventArgs/*?*/ e)
+        internal void graphWorker()
+        //^ requires sender is BackgroundWorker;
+        {
+            // BackgroundWorker worker = (BackgroundWorker)sender;
+
+            // Combine the inputs and outputs if desired.
+            // FiniteStateMachine fsm = combineActions ? machine.CombineInputsAndOutputs() : machine;
+
+            int nkey = 0; // integer key into nodes dictionary
+            int tkey = 0; // integer key into transitions dictionary
+
+            // Clear the node and transition tables.
+            nodes.Clear();
+            // nodes.EmptySet;
+            transitions.Clear();
+            // transitions.EmptySet;
+            dashedEdges.Clear();
+
+            // Create a new GLEE graph.
+            // Microsoft.Glee.Drawing.Graph graph = new Microsoft.Glee.Drawing.Graph("Finite Automaton");
+
+            // Set the layout direction.
+            // graph.GraphAttr.LayerDirection = LayerDirection();
+
+            // Report the total number of states and transitions.
+            // int progress = 0;
+            // worker.ReportProgress(progress, finiteAutomatonContext.fa.States.Count + Math.Min(maxTransitions, finiteAutomatonContext.fa.Transitions.Count));
+
+            //for quick lookup create maps from nodes to all exiting transitions and entering transitions
+            Dictionary<Node, List<Transition>> exitingTransitions = new Dictionary<Node, List<Transition>>();
+            Dictionary<Node, List<Transition>> enteringTransitions = new Dictionary<Node, List<Transition>>();
+            foreach (Node n in finiteAutomatonContext.fa.States)
+            {
+                exitingTransitions[n] = new List<Transition>();
+                enteringTransitions[n] = new List<Transition>();
+            }
+            foreach (Transition t in finiteAutomatonContext.fa.Transitions)
+            {
+                exitingTransitions[t.First].Add(t);
+                enteringTransitions[t.Third].Add(t);
+            }
+            //foreach (Transition t in finiteAutomatonContext.dashedTransitions)
+            //{
+            //    exitingTransitions[t.First].Add(t);
+            //    enteringTransitions[t.Third].Add(t);
+            //}
+            //In Mealy view hidden nodes have one incoming Start action and at
+            //least one outgoing Finish action
+            //with the same action symbol name
+            hiddenMealyNodes = Set<Node>.EmptySet;
+            if (combineActions)
+            {
+                foreach (Node n in finiteAutomatonContext.fa.States)
+                {
+                    if (enteringTransitions[n].Count == 1 && IsStartAction(enteringTransitions[n][0].Second))
+                    {
+                        string actionname = ((CompoundTerm)enteringTransitions[n][0].Second).Symbol.Name.Replace("_Start", "");
+                        if (exitingTransitions[n].Count >= 1
+                            && AllTransitionsAreFinish(actionname, exitingTransitions[n]))
+                        {
+                            hiddenMealyNodes = hiddenMealyNodes.Add(n);
+                        }
+                    }
+                }
+            }
+
+            #region Add the initial state first.
+            // GraphLayout.Drawing.Node initialNode = graph.AddNode(finiteAutomatonContext.fa.InitialState.ToString());
+            if (this.nodeLabelsVisible)
+            {
+                if (this.finiteAutomatonContext.stateProvider != null && this.customStateLabelProvider != null)
+                {
+                    // NB no non-Glee code in this block
+                    // initialNode.Attr.Label = this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(this.finiteAutomatonContext.fa.InitialState));
+                }
+            }
+            else
+            {
+                // NB no non-Glee code in this block
+                // initialNode.Attr.Label = "";
+            }
+            // NB no non-Glee code in this block
+            //initial progress, one node is handled
+            // worker.ReportProgress(++progress);
+            // initialNode.Attr.Fillcolor = new GraphLayout.Drawing.Color(initialStateColor.R, initialStateColor.G, initialStateColor.B);
+            // initialNode.Attr.Shape = MapToGleeShape(this.stateShape);
+            #endregion
+
+            #region Add the transitions by walking the graph depth first
+
+            Stack<Node> stack = new Stack<Node>();
+            Set<Node> visited = Set<Node>.EmptySet;
+            //Notice the invariant: nodes on the stack can not be hidden nodes
+            //base case: initial state cannot be hidden because 
+            //it must have at least one exiting start action or atomic action
+            stack.Push(finiteAutomatonContext.fa.InitialState);
+            visited = visited.Add(finiteAutomatonContext.fa.InitialState);
+            // while (stack.Count > 0 && graph.EdgeCount < maxTransitions)
+            while (stack.Count > 0 && transitions.Count < maxTransitions)
+            {
+                //invariant: nodes on the stack are not hidden nodes
+                Node current = stack.Pop();
+                // GraphLayout.Drawing.Node fromNode = graph.AddNode(current.ToString());
+
+                // nodes[fromNode] = current;
+                // nodes[nkey++] = current;
+                nodes[current] = current;
+                // Console.WriteLine("graphWorker, 1 (line 833): nodes.Count {0}", nodes.Count);
+                // nodes = nodes.Add(current);
+
+                //record the transitions to be added as 
+                //dictionary of MultiLabeledTransitions from current
+                //state indexed by end state
+                Dictionary<Node, MultiLabeledTransition> transitionsToBeAdded =
+                    new Dictionary<Node, MultiLabeledTransition>();
+
+                #region collect transitions to be added into transitionsToBeAdded
+                foreach (Transition t in exitingTransitions[current])
+                {
+                    //do not add dead states if requested
+                    if (this.livenessCheckIsOn &&
+                        !this.deadstatesVisible &&
+                        this.finiteAutomatonContext.deadNodes.Contains(t.Third))
+                        continue;
+
+                    // worker.ReportProgress(++progress); //one transition is handled
+                    if (hiddenMealyNodes.Contains(t.Third))
+                    {
+                        //construct Mealy view of all the exiting transitions from t.Third
+                        foreach (Transition tf in exitingTransitions[t.Third])
+                        {
+                            // worker.ReportProgress(++progress);
+                            //string mealyLabel = (this.actionLabelsVisible ? ConstructMealyLabel(t.Second, tf.Second) : "");
+                            //add target node to the stack, if not visited already
+                            if (!visited.Contains(tf.Third))
+                            {
+                                visited = visited.Add(tf.Third);
+                                if (exitingTransitions[tf.Third].Count > 0)
+                                {
+                                    stack.Push(tf.Third); //notice that invariant is preserved
+                                }
+                                //one more node is handled
+                                // worker.ReportProgress(++progress);
+                            }
+                            // add edge
+                            // GraphLayout.Drawing.Node toNode = graph.AddNode(tf.Third.ToString());
+                            // toNode.Attr.Shape = MapToGleeShape(this.stateShape);
+                            if (this.nodeLabelsVisible)
+                            {
+                                if (this.finiteAutomatonContext.stateProvider != null && this.customStateLabelProvider != null)
+                                {
+                                    // NB no non-Glee code in this block
+                                    // toNode.Attr.Label = this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(tf.Third));
+                                }
+                            }
+                            // else
+                                // NB no non-Glee code in this block
+                                // toNode.Attr.Label = "";
+                            // nodes[toNode] = tf.Third;
+                            // nodes[nkey++] = tf.Third;
+                            nodes[tf.Third] = tf.Third;
+                            // Console.WriteLine("graphWorker, 2 (line 885): nodes.Count {0}", nodes.Count);
+                            // nodes = nodes.Add(tf.Third);
+                            // if (loopsVisible || fromNode.Attr.Id != toNode.Attr.Id)
+                            if (loopsVisible || !current.Equals(tf.Third))
+                            {
+                                MultiLabeledTransition trans;
+                                if (transitionsToBeAdded.TryGetValue(tf.Third, out trans))
+                                {
+                                    trans.AddMealyLabel(t.Second, tf.Second);
+                                }
+                                else
+                                {
+                                    trans = MultiLabeledTransition.Create(t.First, t.Second, tf.Second, tf.Third);
+                                    transitionsToBeAdded[tf.Third] = trans;
+                                }
+                                //GraphLayout.Drawing.Edge edge = graph.AddEdge(fromNode.Attr.Id, mealyLabel, toNode.Attr.Id);
+                                //transitions[edge] = CombinedTransition.Create(t, tf);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //string edgeLabel = (this.actionLabelsVisible ? ConstructEdgeLabel(t.Second) : "");
+                        //add target node to the stack, if not visited already
+                        if (!visited.Contains(t.Third))
+                        {
+                            visited = visited.Add(t.Third);
+                            if (exitingTransitions[t.Third].Count > 0)
+                            {
+                                stack.Push(t.Third); //notice that invariant is trivially preserved
+                            }
+                            //one more node is handled
+                            //worker.ReportProgress(++progress);
+                        }
+                        // add edge
+                        // GraphLayout.Drawing.Node toNode = graph.AddNode(t.Third.ToString());
+                        // toNode.Attr.Shape = MapToGleeShape(this.stateShape);
+                        if (this.nodeLabelsVisible)
+                        {
+                            if (this.finiteAutomatonContext.stateProvider != null && this.customStateLabelProvider != null)
+                            {
+                                // NB no non-Glee code in this block
+                                // toNode.Attr.Label = this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(t.Third));
+                            }
+                        }
+                        // else
+                            // NB no non-Glee code in this block
+                            // toNode.Attr.Label = "";
+                        // nodes[toNode] = t.Third;
+                        // nodes[nkey++] = t.Third;
+                        nodes[t.Third] = t.Third;
+                        // Console.WriteLine("graphWorker, 3 (line 934): nodes.Count {0}", nodes.Count);
+                        // nodes = nodes.Add(t.Third);
+                        // if (loopsVisible || !fromNode.Attr.Id.Equals(toNode.Attr.Id))
+                        if (loopsVisible || !current.Equals(t.Third))
+                        {
+                            MultiLabeledTransition trans;
+                            if (transitionsToBeAdded.TryGetValue(t.Third, out trans))
+                            {
+                                trans.AddLabel(t.Second);
+                            }
+                            else
+                            {
+                                trans = MultiLabeledTransition.Create(t.First, t.Second, t.Third);
+                                transitionsToBeAdded[t.Third] = trans;
+                            }
+                            //GraphLayout.Drawing.Edge edge = graph.AddEdge(fromNode.Attr.Id, edgeLabel, toNode.Attr.Id);
+                            //transitions[edge] = CombinedTransition.Create(t);
+                        }
+                        //one more edge is added
+                        //worker.ReportProgress(++progress);
+                    }
+                }
+                #endregion
+
+                //add all transitions from the current state to glee
+                foreach (MultiLabeledTransition trans in transitionsToBeAdded.Values)
+                {
+                    //don't add transitions that lead to dead states if dead state are turned off
+                    //if (this.livenessCheckIsOn &&
+                    //    !this.deadstatesVisible &&
+                    //    this.finiteAutomatonContext.deadNodes.Contains(trans.endState))
+                    //    continue;
+
+                    // GraphLayout.Drawing.Node toNode = graph.AddNode(trans.endState.ToString());
+                    if (mergeLabels)
+                    {
+                        string lab = (this.transitionLabels != TransitionLabel.None ? trans.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
+                        // GraphLayout.Drawing.Edge edge = graph.AddEdge(fromNode.Attr.Id, lab, toNode.Attr.Id);
+                        // transitions[edge] = trans;
+                        transitions[tkey++] = trans;
+                        // transitions = transitions.Add(trans);
+                    }
+                    else
+                    {
+                        foreach (MultiLabeledTransition tr in trans.CreateOnePerLabel())
+                        {
+                            string lab = (this.transitionLabels != TransitionLabel.None ? tr.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
+                            // GraphLayout.Drawing.Edge edge = graph.AddEdge(fromNode.Attr.Id, lab, toNode.Attr.Id);
+                            // transitions[edge] = tr;
+                            transitions[tkey++] = tr;
+                            // transitions = transitions.Add(tr);
+                        }
+                    }
+                }
+
+            }
+
+            #region Draw dashed arrows specified in the set finiteAutomatonContext.dashedTransitions
+
+            Dictionary<Transition, MultiLabeledTransition> mlDashedTransitions = new Dictionary<Transition, MultiLabeledTransition>();
+            foreach (Transition trans in finiteAutomatonContext.groupingTransitions)
+                mlDashedTransitions.Add(trans, MultiLabeledTransition.Create(trans.First, trans.Second, trans.Third));
+            //add all dashed transitions from the current facontext to GLEE
+            foreach (MultiLabeledTransition trans in mlDashedTransitions.Values)
+            {
+                //don't add transitions that lead to dead states if dead state are turned off
+                //if (this.livenessCheckIsOn &&
+                //    !this.deadstatesVisible &&
+                //    this.finiteAutomatonContext.deadNodes.Contains(trans.endState))
+                //    continue;
+
+                // GraphLayout.Drawing.Node toNd = graph.AddNode(trans.endState.ToString());
+                // GraphLayout.Drawing.Node fromNd = graph.AddNode(trans.startState.ToString());
+                //if (mergeLabels)
+                //{
+                //    string lab = (this.transitionLabels != TransitionLabel.None ? trans.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
+                //    GraphLayout.Drawing.IEdge edge = graph.AddEdge(fromNode.NodeAttribute.Id, lab, toNode.NodeAttribute.Id);
+                //    transitions[edge] = trans;
+                //}
+                //else
+                //{
+                //    foreach (MultiLabeledTransition tr in trans.CreateOnePerLabel())
+                //    {
+                string lab = (this.transitionLabels != TransitionLabel.None ? trans.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
+                // GraphLayout.Drawing.Edge edge = graph.AddEdge(fromNd.Attr.Id, lab, toNd.Attr.Id);
+                // GraphLayout.Drawing.BaseAttr eattr = edge.EdgeAttr as GraphLayout.Drawing.BaseAttr;
+                // eattr.AddStyle(GraphLayout.Drawing.Style.Dashed);
+                // transitions[edge] = trans;
+                transitions[tkey++] = trans;
+                // transitions = transitions.Add(trans);
+                dashedEdges.Add(trans, 0);
+                //    }
+                //}
+            }
+
+            # endregion
+
+            if (stack.Count == 0)
+            {
+                //add unreachable edges and nodes up to the given max count
+                if (visited.Count + hiddenMealyNodes.Count < finiteAutomatonContext.fa.States.Count)
+                {
+                    foreach (Term n in finiteAutomatonContext.fa.States.Difference(visited.Union(hiddenMealyNodes)))
+                    {
+                        //do not consider dead state if they are not visible
+                        if (this.livenessCheckIsOn &&
+                            !this.deadstatesVisible &&
+                            this.finiteAutomatonContext.deadNodes.Contains(n))
+                            continue;
+
+                        //record the transitions to be added as 
+                        //dictionary of MultiLabeledTransitions from current
+                        //state indexed by end state
+                        Dictionary<Node, MultiLabeledTransition> transitionsToBeAdded =
+                             new Dictionary<Node, MultiLabeledTransition>();
+
+
+                        // GraphLayout.Drawing.Node n1 = graph.AddNode(n.ToString());
+                        // n1.Attr.Color = ToGleeColor(Color.Gray);
+                        // n1.Attr.Fontcolor = ToGleeColor(Color.Gray);
+                        // n1.Attr.Shape = MapToGleeShape(this.StateShape);
+                        // nodes[n1] = n;
+                        // nodes[nkey++] = n;
+                        nodes[n] = n;
+                        // Console.WriteLine("graphWorker, 4 (line 1056): nodes.Count {0}", nodes.Count);
+                        // nodes = nodes.Add(n);
+                        if (!this.nodeLabelsVisible)
+                        {
+                            // NB no non-Glee code in this block
+                            // n1.Attr.Label = "";
+                        }
+
+                        foreach (Triple<Term, CompoundTerm, Term> t in exitingTransitions[n])
+                        {
+                            MultiLabeledTransition t1;
+                            if (transitionsToBeAdded.TryGetValue(t.Third, out t1))
+                            {
+                                t1.AddLabel(t.Second);
+                            }
+                            else
+                            {
+                                t1 = MultiLabeledTransition.Create(n, t.Second, t.Third);
+                                transitionsToBeAdded[t.Third] = t1;
+                            }
+                        }
+
+
+                        //add all transitions from the current state to glee
+                        foreach (MultiLabeledTransition t1 in transitionsToBeAdded.Values)
+                        {
+                            // GraphLayout.Drawing.Node n2 = graph.AddNode(t1.endState.ToString());
+                            // nodes[n2] = t1.endState;
+                            // nodes[nkey++] = t1.endState;
+                            nodes[t1.endState] = t1.endState;
+                            // Console.WriteLine("graphWorker, 5 (line 1084): nodes.Count {0}", nodes.Count);
+                            // nodes = nodes.Add(t1.endState);
+                            if (mergeLabels)                                              
+                            {
+                                string lab = (this.transitionLabels != TransitionLabel.None ? t1.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
+                                // GraphLayout.Drawing.Edge e1 = graph.AddEdge(n1.Attr.Id, lab, n2.Attr.Id);
+                                // e1.EdgeAttr.Fontcolor = ToGleeColor(Color.Gray);
+                                // e1.EdgeAttr.Color = ToGleeColor(Color.Gray);
+                                // transitions[e1] = t1;
+                                transitions[tkey++] = t1;
+                                // transitions = transitions.Add(t1);
+                            }
+                            else
+                            {
+                                foreach (MultiLabeledTransition t2 in t1.CreateOnePerLabel())
+                                {
+                                    // string lab = (this.transitionLabels != TransitionLabel.None ? t2.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
+                                    // GraphLayout.Drawing.Edge e1 = graph.AddEdge(n1.Attr.Id, lab, n2.Attr.Id);
+                                    // e1.EdgeAttr.Fontcolor = ToGleeColor(Color.Gray);
+                                    // e1.EdgeAttr.Color = ToGleeColor(Color.Gray);
+                                    // transitions[e1] = t2;
+                                    transitions[tkey++] = t2;
+                                    // transitions = transitions.Add(t2);
+                                }
+                            }
+                        }
+                        // if (graph.EdgeCount >= maxTransitions)
+                        if (transitions.Count >= maxTransitions)
+                            break;
+                    }
+                }
+            }
+            #endregion
+
+            #region Format the nodes.
+            // Mark dead states
+            if (this.livenessCheckIsOn)
+            {
+                Set<Node> deadNodes = finiteAutomatonContext.deadNodes.Intersect(visited);
+                foreach (Node deadNode in deadNodes)
+                {
+                    // NB no non-Glee code in this block
+                    // GraphLayout.Drawing.Node deadGleeNode = graph.AddNode(deadNode.ToString());
+                    //deadGleeNode.Attr.Fillcolor =
+                    // new GraphLayout.Drawing.Color(deadStateColor.R, deadStateColor.G, deadStateColor.B);
+                }
+            }
+
+            //while (stack.Count > 0)
+            //{
+            //    Node truncatedNode = stack.Pop();
+            //    GraphLayout.Drawing.Node truncatedGleeNode = graph.AddNode(truncatedNode.ToString());
+            //    truncatedGleeNode.Attr.Fillcolor =
+            //        new GraphLayout.Drawing.Color(truncatedStateColor.R, truncatedStateColor.G, truncatedStateColor.B);
+            //}
+
+            // Mark accepting states with a thicker line
+            // TBD: waiting for Lev to provide double-line feature
+            if (this.acceptingStatesMarked)
+            {
+                foreach (Node accNode in finiteAutomatonContext.fa.AcceptingStates.Intersect(visited))
+                {
+                    // NB no non-Glee code in this block
+                    // GraphLayout.Drawing.Node acceptingGleeNode = graph.AddNode(accNode.ToString());
+                    // acceptingGleeNode.Attr.Shape = MapToGleeShape(stateShape);
+                    // acceptingGleeNode.Attr.LineWidth = 4;
+                }
+            }
+
+            // Mark error states
+            if (this.safetyCheckIsOn)
+            {
+                if (finiteAutomatonContext.stateProvider != null && finiteAutomatonContext.mp != null)
+                {
+                    this.finiteAutomatonContext.unsafeNodes = Set<Term>.EmptySet;
+                    foreach (Node visitedNode in finiteAutomatonContext.fa.States.Intersect(visited))
+                    {
+                        IState istate = finiteAutomatonContext.stateProvider(visitedNode);
+                        if (!finiteAutomatonContext.mp.SatisfiesStateInvariant(istate))
+                        {
+                            // NB update finiteAutomatonContext here to indicate unsafe nodes
+                            this.finiteAutomatonContext.unsafeNodes =
+                                this.finiteAutomatonContext.unsafeNodes.Add(visitedNode);
+                            // GraphLayout.Drawing.Node visitedGleeNode = graph.AddNode(visitedNode.ToString());
+                            // visitedGleeNode.Attr.Shape = MapToGleeShape(stateShape);
+                            // visitedGleeNode.Attr.Fillcolor = ToGleeColor(this.unsafeStateColor);
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            // Start the marquee mode of the progress bar.
+            // worker.ReportProgress(-1);
+
+            //insert a delay to avoid a crash in this version of GLEE
+            // System.Threading.Thread.Sleep(200);
+
+            // Return the calculated layout as the result.
+            // e.Result = viewer.CalculateLayout(graph);
+        }
+
+        /// COPIED FROM NModel.Visualization  GraphView ToDot
+        /// contains: foreach (Node node in this.nodes.Values) ...
         /// <summary>
         /// Produce dot output of the graph
         /// </summary>
@@ -690,6 +1205,7 @@ namespace NModel.Utilities.Graph
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         internal string ToDot()
         {
+            // Console.WriteLine("ToDot: this.nodes.Count {0}, this.transitions.Count {1}", this.nodes.Count, this.transitions.Count);
             StringBuilder sb = new StringBuilder();
             sb.Append("digraph ");
             AppendLabel(sb, finiteAutomatonContext.name);
@@ -710,9 +1226,9 @@ namespace NModel.Utilities.Graph
 
             sb.Append("  //Accepting states\n  node ");
             AppendAcceptingStateAttributes(sb);
-            foreach (Node node in this.finiteAutomatonContext.fa.States)
+            foreach (Node node in this.nodes.Values)
             {
-                if (this.finiteAutomatonContext.fa.AcceptingStates.Contains(node) && 
+                if (this.finiteAutomatonContext.fa.AcceptingStates.Contains(node) &&
                     !node.Equals(finiteAutomatonContext.fa.InitialState) &&
                     !(this.safetyCheckIsOn && this.finiteAutomatonContext.unsafeNodes.Contains(node)))
                 {
@@ -725,7 +1241,7 @@ namespace NModel.Utilities.Graph
             {
                 sb.Append("  //Dead states\n  node ");
                 AppendDeadStateAttributes(sb);
-                foreach (Node node in this.finiteAutomatonContext.fa.States)
+                foreach (Node node in this.nodes.Values)
                 {
                     if (this.finiteAutomatonContext.deadNodes.Contains(node) && !node.Equals(finiteAutomatonContext.fa.InitialState))
                     {
@@ -739,12 +1255,9 @@ namespace NModel.Utilities.Graph
             {
                 sb.Append("  //Unsafe states\n  node ");
                 AppendUnsafeStateAttributes(sb);
-
-                // Code here assigned unsafeNodes, now moved to FAContext.CollectUnsafeNodes
-
-                foreach (Node node in this.finiteAutomatonContext.fa.States)
+                foreach (Node node in this.nodes.Values)
                 {
-                    if (this.finiteAutomatonContext.unsafeNodes.Contains(node) 
+                    if (this.finiteAutomatonContext.unsafeNodes.Contains(node)
                         && !node.Equals(finiteAutomatonContext.fa.InitialState))
                     {
                         AddNodeLabel(sb, node, this.finiteAutomatonContext.fa.AcceptingStates.Contains(node));
@@ -755,12 +1268,12 @@ namespace NModel.Utilities.Graph
 
             sb.Append("  //Safe live nonaccepting states\n  node ");
             AppendNonAcceptingStateAttributes(sb);
-            foreach (Node node in this.finiteAutomatonContext.fa.States)
+            foreach (Node node in this.nodes.Values)
             {
-                if (!this.finiteAutomatonContext.fa.AcceptingStates.Contains(node) && 
-                    !node.Equals(finiteAutomatonContext.fa.InitialState) && 
+                if (!this.finiteAutomatonContext.fa.AcceptingStates.Contains(node) &&
+                    !node.Equals(finiteAutomatonContext.fa.InitialState) &&
                     !(this.livenessCheckIsOn && this.finiteAutomatonContext.deadNodes.Contains(node)) &&
-                    !(this.safetyCheckIsOn && this.finiteAutomatonContext.unsafeNodes.Contains(node)) )
+                    !(this.safetyCheckIsOn && this.finiteAutomatonContext.unsafeNodes.Contains(node)))
                 {
                     AddNodeLabel(sb, node);
                 }
@@ -768,18 +1281,18 @@ namespace NModel.Utilities.Graph
             sb.Append("\n\n");
 
             sb.Append("  //Transitions");
-            foreach (Transition ta in this.finiteAutomatonContext.fa.Transitions)
+            foreach (MultiLabeledTransition t in this.transitions.Values)
             {
-                MultiLabeledTransition t = MultiLabeledTransition.Create(ta.First, ta.Second, ta.Third);
                 sb.Append("\n  ");
                 AppendLabel(sb, t.startState);
                 sb.Append(" -> ");
                 AppendLabel(sb, t.endState);
-                String style="";
-                if (dashedEdges.ContainsKey(t)) {
-                     style="style=dashed";
+                String style = "";
+                if (dashedEdges.ContainsKey(t))
+                {
+                    style = "style=dashed";
                 }
-                if (this.transitionLabels != TransitionLabel.None || style.Length>0)
+                if (this.transitionLabels != TransitionLabel.None || style.Length > 0)
                 {
                     sb.Append(" [ ");
                     bool comma = false;
