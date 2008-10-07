@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Mp2Dot")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hewlett-Packard")]
+[assembly: AssemblyCompany("NModel project")]
 [assembly: AssemblyProduct("Mp2Dot")]
-[assembly: AssemblyCopyright("Copyright © Hewlett-Packard 2008")]
+[assembly: AssemblyCopyright("Copyright © Jonathan Jacky, Margus Veanes, Colin Campbell, Juhan Ernits 2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
