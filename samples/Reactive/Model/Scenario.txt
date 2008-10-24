@@ -1,0 +1,4 @@
+FSM(0,AcceptingStates(),Transitions(
+			      t(0,Message("99.9"),1),
+			      t(1,Message("999.9"),2),
+			      t(2,Calibrate(),3)))

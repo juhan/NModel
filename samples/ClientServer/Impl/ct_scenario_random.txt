@@ -1,0 +1,26 @@
+# response file with ct arguments to execute tests generated offline
+# from contract model program
+
+# Test harness assembly
+
+/r:Stepper.dll
+
+# Test harness factory method
+
+/iut:ClientServerImpl.Stepper.Create
+
+# Model program assembly
+
+/r:..\Model\ClientServer.dll
+
+# use /mp switch instead of factory method
+
+/mp:ClientServer
+
+# Scenario FSM
+
+/fsm:..\Model\Scenario.txt
+
+# one run at a time
+/runs:1
+

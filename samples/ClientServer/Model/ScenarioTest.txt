@@ -1,0 +1,21 @@
+TestSuite(
+    TestCase(
+        ServerSocket(),
+        ServerBind(),
+        ServerListen(),
+        ClientSocket(),
+        ClientConnect(),
+        ServerAccept(),
+        ClientSend(),
+        ServerReceive(),
+        ServerSend(double("99.9")),
+        ClientReceive_Start(),
+        ClientReceive_Finish(double("99.9")),
+        ServerSend(double("100")),
+        ClientReceive_Start(),
+        ClientReceive_Finish(double("100")),
+        ClientClose(),
+        ServerCloseConnection(),
+        ServerClose()
+    )
+)

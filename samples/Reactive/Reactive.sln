@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5D15F8B-97F1-4C54-9253-41FF035FE844}"
+	ProjectSection(SolutionItems) = preProject
+		README.txt = README.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveModel", "Model\ReactiveModel.csproj", "{E86246A7-7E01-464B-BB2A-9D04721C6298}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveSimulationModel", "Simulation\ReactiveSimulationModel.csproj", "{E00532DC-C156-4AB4-AD82-A3ED5A99036B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E86246A7-7E01-464B-BB2A-9D04721C6298}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E86246A7-7E01-464B-BB2A-9D04721C6298}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E86246A7-7E01-464B-BB2A-9D04721C6298}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E86246A7-7E01-464B-BB2A-9D04721C6298}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E00532DC-C156-4AB4-AD82-A3ED5A99036B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E00532DC-C156-4AB4-AD82-A3ED5A99036B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E00532DC-C156-4AB4-AD82-A3ED5A99036B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E00532DC-C156-4AB4-AD82-A3ED5A99036B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

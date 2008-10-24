@@ -1,0 +1,20 @@
+# response file for mpv arguments for liveness analysis as in figure 6.12
+
+#
+# Referenced assemblies
+#
+/r:Reactive.dll
+
+#
+# use /mp switch not factory method
+#
+/mp:Reactive
+
+#
+# Viewer settings
+#
+/maxTransitions:300
+/stateShape:Circle
+/combineActions+
+/acceptingStatesMarked+
+/livenessCheckIsOn+

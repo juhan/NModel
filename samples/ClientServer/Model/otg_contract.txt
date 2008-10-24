@@ -1,0 +1,14 @@
+# response file with otg arguments to generate tests from 
+# contract model program, as described in section 8.1
+
+# Referenced assembly
+
+/r:ClientServer.dll
+
+# use /mp switch instead of factory method
+
+/mp:ClientServer
+
+# Test scenario file
+
+/file:ContractTest.txt

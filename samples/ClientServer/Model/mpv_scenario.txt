@@ -1,0 +1,5 @@
+# response file with mpv arguments for test scenario as in fig. 7.14
+
+# FSM file with test scenario
+
+/fsm:Scenario.txt

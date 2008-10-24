@@ -1,0 +1,3 @@
+# show self-loops, /loopsVisible+ is default
+
+/fsm:M1-loop.txt

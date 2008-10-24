@@ -1,0 +1,5 @@
+# response file with mpv arguments for safey analysis scenario as in fig. 7.20
+
+# FSM file with test scenario
+
+/fsm:Scenario.txt

@@ -1,0 +1,27 @@
+# response file with mpv arguments contract composed with scenario
+# as in fig. 7.21
+
+# Referenced assembly
+
+/r:Reactive.dll
+
+# use /mp switch not factory method
+
+/mp:Reactive
+
+# Scenario
+
+/fsm:Scenario.txt
+
+# View matching start and finish actions as a single transition
+
+/combineActions+
+
+# Safety analysis
+
+/safetyCheckIsOn+
+
+# Other viewer settings
+
+/maxTransitions:300
+/stateShape:Circle

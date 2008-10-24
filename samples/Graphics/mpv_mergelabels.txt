@@ -1,0 +1,3 @@
+# merge labels, default
+
+/fsm:MergeLabels.txt

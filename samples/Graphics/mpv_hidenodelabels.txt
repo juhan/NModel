@@ -1,0 +1,4 @@
+# hide node labels
+
+/fsm:M1-loop.txt
+/nodeLabelsVisible-

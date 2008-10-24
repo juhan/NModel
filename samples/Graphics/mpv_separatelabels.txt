@@ -1,0 +1,4 @@
+# separate labels
+
+/fsm:MergeLabels.txt
+/mergeLabels-

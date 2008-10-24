@@ -1,0 +1,4 @@
+# hide self-loops
+
+/fsm:M1-loop.txt
+/loopsVisible-

@@ -1,0 +1,32 @@
+# "response file" with mpv arguments contract composed with scenario
+# as in fig. 7.15
+
+# Referenced assembly
+
+/r:ClientServerFactoryMethod.dll
+
+# Scenario
+
+/fsm:Scenario.txt
+
+# View matching start and finish actions as a single transition
+
+/combineActions+
+
+# Other options, including /direction:LeftToRight
+
+/initialStateColor:Green
+/stateShape:Octagon
+/transitionLabels:ActionSymbol
+/direction:LeftToRight
+/acceptingStatesMarked-
+
+# These options have no effect in non-interactive program,
+# but must cause no problems to ensure compatibility with mpv response files
+
+/hoverColor:Red
+/selectionColor:DarkOrange
+
+# factory method
+
+ClientServer.Factory.Create

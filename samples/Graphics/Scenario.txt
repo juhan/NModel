@@ -1,0 +1,11 @@
+FSM(0, Acc(9), 
+Transitions(
+      t(0,ServerSocket(),1),
+      t(1,ServerBind(),2),
+      t(2,ServerListen(),3),
+      t(3,ClientSocket(),4),
+      t(4,ClientConnect(),5),
+      t(5,ServerAccept(),6),
+      t(6,ClientClose(),7),
+      t(7,ServerCloseConnection(),8),
+      t(8,ServerClose(),9)))

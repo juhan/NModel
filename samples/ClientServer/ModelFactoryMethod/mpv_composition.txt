@@ -1,0 +1,18 @@
+# "response file" with mpv arguments contract composed with scenario
+# as in fig. 7.15
+
+# Referenced assembly
+
+/r:ClientServerFactoryMethod.dll
+
+# Factory method
+
+ClientServer.Factory.Create
+
+# Scenario
+
+/fsm:Scenario.txt
+
+# View matching start and finish actions as a single transition
+
+/combineActions+

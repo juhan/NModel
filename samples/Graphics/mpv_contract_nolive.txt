@@ -1,0 +1,13 @@
+# "response file" with mpv arguments for contract model program as in fig. 7.1
+
+# Referenced assembly
+
+/r:ClientServer.dll
+
+# /mp switch instead of factory method
+
+/mp:ClientServer
+
+# DON'T Show dead states
+
+# /livenessCheckIsOn+

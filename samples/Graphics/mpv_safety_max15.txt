@@ -1,0 +1,20 @@
+# response file for mpv arguments for safety analysis as in fig. 6.9
+
+#
+# Referenced assemblies
+#
+/r:Reactive.dll
+
+#
+# use /mp switch not factory method
+#
+/mp:Reactive
+
+#
+# Viewer settings
+#
+/maxTransitions:15
+/stateShape:Circle
+/combineActions+
+/safetyCheckIsOn+
+

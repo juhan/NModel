@@ -1,0 +1,20 @@
+# response file for mpv arguments for safety analysis as in fig. 6.9
+
+#
+# Referenced assemblies
+#
+/r:Reactive.dll
+
+#
+# Factory method of the model program that is being viewed
+#
+Reactive.Factory.Create
+
+#
+# Viewer settings
+#
+/maxTransitions:300
+/stateShape:Circle
+/combineActions+
+/safetyCheckIsOn+
+

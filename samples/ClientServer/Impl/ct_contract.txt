@@ -1,0 +1,14 @@
+# response file with ct arguments to execute tests generated offline
+# from contract model program
+
+# Test harness assembly
+
+/r:Stepper.dll
+
+# Test harness factory method
+
+/iut:ClientServerImpl.Stepper.Create
+
+# Test suite generated offline by otg
+
+/testSuite:..\Model\ContractTest.txt

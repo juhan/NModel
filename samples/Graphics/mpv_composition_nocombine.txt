@@ -1,0 +1,15 @@
+# "response file" with mpv arguments contract composed with scenario
+# as in fig. 7.15
+
+# Referenced assembly
+
+/r:ClientServer.dll
+
+# /mp switch instead of factory method
+
+/mp:ClientServer
+
+# Scenario
+
+/fsm:Scenario.txt
+

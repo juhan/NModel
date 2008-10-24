@@ -1,0 +1,14 @@
+# response file with otg arguments to generate tests from 
+# contract model program, as described in section 8.1
+
+# Referenced assembly
+
+/r:ClientServerFactoryMethod.dll
+
+# Factory method
+
+ClientServer.Factory.Create
+
+# Test scenario file
+
+/file:ContractTest.txt

@@ -1,0 +1,13 @@
+# "response file" with mpv arguments for contract model program as in fig. 7.1
+
+# Referenced assembly
+
+/r:ClientServerFactoryMethod.dll
+
+# Factory method
+
+ClientServer.Factory.Create
+
+# Show dead states
+
+/livenessCheckIsOn+
