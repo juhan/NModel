@@ -1,0 +1,8 @@
+FSM
+(0, AcceptingStates(3), 
+Transitions(
+	t(0, Login_Start(User("OleBrumm"),Password("Correct")), 2),
+	t(2, Login_Finish(User("OleBrumm"),LoginStatus("Success")), 3)
+),
+	Vocabulary("Login_Start", "Login_Finish")
+)

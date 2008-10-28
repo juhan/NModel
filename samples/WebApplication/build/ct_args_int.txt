@@ -1,0 +1,17 @@
+
+/r:WebModel.dll
+/r:Adapter.dll
+
+# Site1.cs and Site2.cs are simple examples
+# how to incorporate site specific data into 
+# the adapter/harness
+/iut:Adapter.Site1.Create
+
+# Look into intlog.txt for the results of testing
+/logfile:intlog.txt
+
+#/steps:20
+
+#/fsm:scenario_login.txt
+
+WebModel.Contract.CreateIntModel

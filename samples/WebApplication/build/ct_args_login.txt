@@ -1,0 +1,11 @@
+
+/r:WebModel.dll
+/r:Adapter.dll
+
+# Make sure you specify your site specific URLs in Adapter/Site1.cs
+/iut:Adapter.Site1.Create
+
+
+#/fsm:scenario_login.txt
+
+WebModel.Contract.CreateLoginModel
