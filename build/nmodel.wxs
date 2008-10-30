@@ -19,6 +19,7 @@ on Wix.
       <ComponentRef Id="NModelVisualizationSymbolsComponent" Primary="yes"/>
       <ComponentRef Id="NModelFsm2DotComponent" Primary="yes"/>
       <ComponentRef Id="NModelMpvComponent" Primary="yes"/>
+      <ComponentRef Id="NModelMp2DotComponent" Primary="yes"/>
       <ComponentRef Id="NModelCtComponent" Primary="yes"/>
       <ComponentRef Id="NModelOtgComponent" Primary="yes"/>
       <ComponentRef Id="NModelXmlDocsComponent" Primary="yes"/>
@@ -79,6 +80,12 @@ on Wix.
          Id="NModelMpvComponent"
         Guid="{1B71F859-7E5E-48a7-A1B9-28207DAEF008}">
         <File Id="MpvExe" DiskId="1" Source="$(var.BinDirectory)\mpv.exe" Name="mpv.exe" Vital="yes" />
+      </Component>
+      
+      <Component
+         Id="NModelMp2DotComponent"
+        Guid="{A3B4B2A1-ED6E-41db-9144-5F4A4D0A755F}">
+        <File Id="mp2dotExe" DiskId="1" Source="$(var.BinDirectory)\mp2dot.exe" Name="mp2dot.exe" Vital="yes" />
       </Component>
       <Component
           Id="NModelCtComponent"

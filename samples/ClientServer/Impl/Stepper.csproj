@@ -25,6 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Client, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="NModel, Version=1.0.20430.0, Culture=neutral, PublicKeyToken=1ab4cd1a09bd7aa7, processorArchitecture=MSIL">
@@ -32,6 +33,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Server, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
