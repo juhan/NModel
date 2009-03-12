@@ -185,12 +185,12 @@ namespace NModel.Internals
         /// Get the default type of the sort
         /// </summary>
         public Type DefaultSortType(Symbol sort)
-        {
+        {            
             Type result;
             if (sortType.TryGetValue(sort, out result))
                 return result;
 
-            string[] namespaces = new string[] {"NModel", "NModel.Internals", "NModel.Terms", "System" };
+            string[] namespaces = new string[] { "NModel", "NModel.Internals", "NModel.Terms", "System" };
 
             if (sort.DomainParameters != null && sort.DomainParameters.Count > 0)
             {
@@ -241,15 +241,59 @@ namespace NModel.Internals
                         break;
                 }
             }
+            if (result == null)
+                // If the execution got here it means that it didn't find the type of sort 
+                // in this model and in the NModel framework.
+                // Check for the type in the AppDomain assemblies - 
+                // Is it a type of another model program that is being composed with this one        
+                result = getSortTypeFromAppDomainAssemblies(namespaces, sort.Name);                             
 
             if (result == null)
-                throw new ArgumentException("No default type for sort " + sort.ToString());
+                throw new ArgumentException("No default type for sort " + sort.ToString());            
 
             this.RegisterSortType(sort, result);
             return result;
         }
 
+        /// <summary>
+        /// Check for the type in the AppDomain assemblies - 
+        /// Is it a type of another model program that is being composed with this one
+        /// Exclude from checking all the namespaces that have been checked already
+        /// </summary>
+        /// <param name="excludeNameSpaces"></param>
+        /// <param name="sortTypeName"></param>
+        /// <returns>Type - the type of the given sort, or null if a matching type was not found</returns>
+        private Type getSortTypeFromAppDomainAssemblies(string[] excludeNameSpaces, string sortTypeName)
+        {
+            Type thisSortType = null;
 
+            // Get all the assemblies loaded into this AppDomain.
+            foreach (Assembly thisAssembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                int i;
+                // Exclude all the namespaces that have been checked already
+                for (i = 0; i < excludeNameSpaces.Length; ++i)
+                {
+                    if (thisAssembly.GetName().Name == excludeNameSpaces[i])
+                        break;
+                }
+                if (i == excludeNameSpaces.Length)
+                {
+                    foreach (Type t in thisAssembly.GetExportedTypes())
+                    {
+                        if (t.Name == sortTypeName)
+                        {
+                            // Found it!
+                            thisSortType = t;
+                            break;
+                        }
+                    }                    
+                }
+                if (thisSortType != null)
+                    break;
+            }
+            return thisSortType;
+        }
 
         ///// <summary>
         ///// Accesses the mapping of .NET types to sorts (abstract types used to connect model programs). This 
