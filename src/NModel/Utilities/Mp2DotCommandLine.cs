@@ -21,6 +21,11 @@ namespace NModel.Utilities.Graph
     public static class CommandLineViewer
     {
         /// <summary>
+        /// A string that holds the list of state-variables that the user wants to be seen in the tooltips
+        /// </summary>
+        public static string StateTooltipVars = "";   
+
+        /// <summary>
         /// Provides programmatic access to the commandline utility 'mp2dot.exe'.
         /// </summary>
         /// <param name="args">command line arguments: model program(s), optional settings for the viewer</param>
@@ -166,6 +171,23 @@ namespace NModel.Utilities.Graph
             }
             #endregion
 
+            #region load the state variables for state tooltip if any
+            if (!String.IsNullOrEmpty(settings.StateVarsFile))
+            {
+                try
+                {
+                    System.IO.StreamReader stateVarsReader =
+                        new System.IO.StreamReader(settings.StateVarsFile);
+                    StateTooltipVars = stateVarsReader.ReadToEnd();
+                    stateVarsReader.Close();
+                }
+                catch (Exception e)
+                {
+                    throw new ModelProgramUserException("Cannot create state variables list: " + e.Message);
+                }
+            }
+            #endregion
+
             if (mp == null && testcases.IsEmpty && fsms.Count == 0)
             {
                 throw new ModelProgramUserException("No model, fsm, or test suite was given.");
@@ -279,6 +301,7 @@ namespace NModel.Utilities.Graph
             stateViewVisible = false;
             dotFileName = null;
             machineFileName = null;
+            StateVarsFile = null;
         }
 
         [DefaultArgument(ArgumentType.MultipleUnique, HelpText = "Fully qualified names of factory methods returning an object that implements ModelProgram. Multiple model programs are composed into a product.")]
@@ -367,5 +390,8 @@ namespace NModel.Utilities.Graph
 
         [Argument(ArgumentType.AtMostOnce, ShortName = "machine", HelpText = "The name of the file where FSM goes")]
         public string machineFileName;
+
+        [Argument(ArgumentType.AtMostOnce, ShortName = "tip", HelpText = "File containing the state-variables the user wants to see in the state tooltip.")]
+        public string StateVarsFile;
     }
 }

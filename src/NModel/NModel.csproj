@@ -141,6 +141,7 @@
     <Compile Include="Modeling\ModelAttributes\DomainAttribute.cs" />
     <Compile Include="Modeling\ModelAttributes\ExcludeFromState.cs" />
     <Compile Include="Modeling\ModelAttributes\FeatureAttribute.cs" />
+    <Compile Include="Modeling\ModelAttributes\HideFromViewer.cs" />
     <Compile Include="Modeling\ModelAttributes\RequirementAttribute.cs" />
     <Compile Include="Modeling\ModelAttributes\ScenarioAttribute.cs" />
     <Compile Include="Modeling\ModelAttributes\SplitAttribute.cs" />

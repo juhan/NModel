@@ -297,6 +297,17 @@ namespace NModel.Utilities
             return (pInfo.IsOut || pType.IsByRef);
         }
 
+        // The list of the state variables that should be hidden from the viewer
+        private static List<string> hiddenVars = new List<string>();
+        /// <summary>
+        /// The list of the state variables that should be hidden from the viewer
+        /// </summary>
+        public static List<string> HiddenVars
+        {
+            get { return ReflectionHelper.hiddenVars; }
+        }
+        
+
         /// <summary>
         /// Is the field a model variable?
         /// </summary>
@@ -319,6 +330,12 @@ namespace NModel.Utilities
             object/*?*/[]/*?*/ attrs = field.GetCustomAttributes(typeof(ExcludeFromStateAttribute), true);
             object[] attrs2 = field.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), true);
             bool isExcluded = attrs != null && attrs.Length > 0;
+
+            // Fill the list of the state variables that should be hidden from the viewer
+            object/*?*/[]/*?*/ hidenAttrs = field.GetCustomAttributes(typeof(HideFromViewerAttribute), true);
+            if (hidenAttrs != null && hidenAttrs.Length > 0)
+                hiddenVars.Add(field.Name);
+
             bool isCompilerGeneratedField = attrs2 != null && attrs2.Length > 0;
             bool isLiteral = field.IsLiteral;
             bool isStaticReadonly = field.IsInitOnly && field.IsStatic;

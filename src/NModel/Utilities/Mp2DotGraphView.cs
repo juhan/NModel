@@ -418,7 +418,8 @@ namespace NModel.Utilities.Graph
         // Code copied or modified from Graphview.cs in NModel.Visualization follows
 
         // Color name strings originally chosen for .NET work with Dot also, fortunately
-        static string ToDotColor(Color c) { return c.color; }
+        // Some Dot viewers only accept lower case color names
+        static string ToDotColor(Color c) { return c.color.ToLower(); }
 
         // removed several members here
 
@@ -1194,7 +1195,7 @@ namespace NModel.Utilities.Graph
 
             // Return the calculated layout as the result.
             // e.Result = viewer.CalculateLayout(graph);
-        }
+        }        
 
         /// COPIED FROM NModel.Visualization  GraphView ToDot
         /// contains: foreach (Node node in this.nodes.Values) ...
@@ -1231,8 +1232,9 @@ namespace NModel.Utilities.Graph
                 if (this.finiteAutomatonContext.fa.AcceptingStates.Contains(node) &&
                     !node.Equals(finiteAutomatonContext.fa.InitialState) &&
                     !(this.safetyCheckIsOn && this.finiteAutomatonContext.unsafeNodes.Contains(node)))
-                {
+                {                    
                     AddNodeLabel(sb, node);
+                    AddNodeTooltip(sb, node);
                 }
             }
             sb.Append("\n\n");
@@ -1246,6 +1248,7 @@ namespace NModel.Utilities.Graph
                     if (this.finiteAutomatonContext.deadNodes.Contains(node) && !node.Equals(finiteAutomatonContext.fa.InitialState))
                     {
                         AddNodeLabel(sb, node);
+                        AddNodeTooltip(sb, node);
                     }
                 }
             }
@@ -1261,6 +1264,7 @@ namespace NModel.Utilities.Graph
                         && !node.Equals(finiteAutomatonContext.fa.InitialState))
                     {
                         AddNodeLabel(sb, node, this.finiteAutomatonContext.fa.AcceptingStates.Contains(node));
+                        AddNodeTooltip(sb, node);
                     }
                 }
             }
@@ -1276,6 +1280,7 @@ namespace NModel.Utilities.Graph
                     !(this.safetyCheckIsOn && this.finiteAutomatonContext.unsafeNodes.Contains(node)))
                 {
                     AddNodeLabel(sb, node);
+                    AddNodeTooltip(sb, node);
                 }
             }
             sb.Append("\n\n");
@@ -1294,12 +1299,15 @@ namespace NModel.Utilities.Graph
                 }
                 if (this.transitionLabels != TransitionLabel.None || style.Length > 0)
                 {
+                    string sTransition = "";
                     sb.Append(" [ ");
                     bool comma = false;
                     if (this.transitionLabels != TransitionLabel.None)
                     {
                         sb.Append("label = ");
-                        AppendLabel(sb, t.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol));
+                        sTransition = t.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol);
+                        // Append the label with spaces at its beginning and ending
+                        AppendSpacedLabel(sb, sTransition);
                         comma = true;
                     }
                     if (style.Length > 0)
@@ -1308,7 +1316,15 @@ namespace NModel.Utilities.Graph
                             sb.Append(", ");
                         sb.Append(style);
                     }
-                    sb.Append(" ];");
+                    // Add the tooltip
+                    sb.Append(", tooltip = \"");
+                    // Show the transition name so the user can see what is the start-state 
+                    // even if it out of the screen area
+                    sb.Append("\\E: ");
+                    // Remove quotes in sTransition for the tooltip
+                    sTransition = sTransition.Replace("\"", "");
+                    sb.Append(sTransition);
+                    sb.Append(" \"];");
                 }
             }
             sb.Append("\n}\n");
@@ -1342,6 +1358,92 @@ namespace NModel.Utilities.Graph
             else if (accepting)
                 sb.Append(" [peripheries = 2]");
 
+        }
+
+        
+        /// <summary>
+        /// Display the values of state variables        
+        /// 
+        /// Copied from: NModel.Visualization.GraphView
+        /// With the addition of the filtering abilities:
+        /// [HideFromViewer] attribute and StateTooltipVars
+        /// 
+        /// TO DO: Add new-line to separate the variables for readiness ("/n" doesn't work)
+        /// </summary>
+        private string DefaultNodeTooltip(IState iState)
+        {
+            IPairState pairState = iState as IPairState;
+
+            if (pairState != null)
+            {
+                string firstState = DefaultNodeTooltip(pairState.First);
+                string secState = DefaultNodeTooltip(pairState.Second);
+
+                //return firstState + "\n" + secState; // "\n" doesn't work with tooltips 
+                return firstState + " . . . " + secState;
+            }
+
+            IExtendedState iestate = iState as IExtendedState;
+            if (iestate == null)
+                return iState.ControlMode.ToCompactString();
+
+            StringBuilder sb = new StringBuilder();
+            bool rest = false;
+            for (int i = 0; i < iestate.LocationValuesCount; i++)
+            {
+                string varName = iestate.GetLocationName(i);
+                // A state variable is shown in a tooltip when:
+                // 1. The field doesn't have the [HideFromViewer] attribute
+                // 2. The StateTooltipVars string is either empty or contains the name of this variable.
+                if (
+                    // Is there a list of state variables to show taken from an external file
+                    // If the list is empty (no external file) then continue to evaluate the next expression
+                    ((CommandLineViewer.StateTooltipVars.Length == 0) |
+                    // If there is a list of state variables to show taken from an external file
+                    // Check if this variable is in that list
+                    (CommandLineViewer.StateTooltipVars.Contains(varName))) &&
+                    // If this field has [HideFromViewer] attribute - don't show it
+                    (!ReflectionHelper.HiddenVars.Contains(varName))
+                    )
+                {
+                    string varVal = iestate.GetLocationValue(i).ToCompactString();
+                    // Remove spaces from varVal
+                    varVal = varVal.Replace(" ", "");
+
+                    //if (rest) sb.Append("\n"); // "\n" doesn't work with tooltips 
+                    if (rest) sb.Append(" . . . ");
+
+                    sb.Append(varName);
+                    sb.Append("==");
+                    sb.Append(varVal);
+
+                    rest = true;
+                }
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Add tooltip with state variables values
+        /// 
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="node"></param>
+        private void AddNodeTooltip(StringBuilder sb, Node node)
+        {
+            sb.Append("[tooltip = \"");
+            // Create string for the tooltip
+            StringBuilder sTooltip = new StringBuilder();
+            if (finiteAutomatonContext.stateProvider != null)
+                sTooltip.Append( DefaultNodeTooltip(finiteAutomatonContext.stateProvider(node)) );
+            else
+                sTooltip.Append("//Variables in state " + node.ToString() + " are undefined");
+            // Remove quotes in sTooltip
+            sTooltip.Replace("\"", "");
+            sb.Append(sTooltip);
+            sb.Append("\"];");
+            // Remove the last 3 dots at the end of a line in sb
+            //sb.Replace(" . . . \"", "\"");
         }
 
         void AppendAcceptingStateAttributes(StringBuilder sb)
@@ -1395,6 +1497,15 @@ namespace NModel.Utilities.Graph
             sb.Append("\"");
             sb.Append(l.ToString().Replace("\"", "\\\"").Replace("\n", "\\n"));
             sb.Append("\"");
+        }
+
+        // Having spaces at the beginning and ending of an action text 
+        // will prevent adjacent action-texts from obscure each other
+        static void AppendSpacedLabel(StringBuilder sb, IComparable l)
+        {
+            sb.Append("\"     ");
+            sb.Append(l.ToString().Replace("\"", "\\\"").Replace("\n", "\\n"));
+            sb.Append("     \"");
         }
 
         static string ToDotShape(StateShape shape)
