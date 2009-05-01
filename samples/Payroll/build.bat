@@ -1,1 +1,1 @@
-msbuild && rmdir /S /Q obj"
+msbuild /p:Configuration=Debug /p:Platform="Any CPU" && rmdir /S /Q obj

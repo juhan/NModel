@@ -1,0 +1,20 @@
+#--------------------------
+# Sample settings for mpv
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\Payroll.dll
+
+#
+# Factory method of the model program that is being viewed
+#
+Payroll.Program.Create
+/fsm:FSM.txt
+
+#
+# Appearance (transitions): hide self-loops
+#
+/loopsVisible-
+

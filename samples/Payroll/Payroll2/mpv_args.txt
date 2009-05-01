@@ -7,8 +7,8 @@
 #
 /r:bin\\Payroll.dll
 
-#
-# Factory method of the model program that is being viewed
-#
-Payroll.Program.Create
+/mp:Payroll
+
 /fsm:FSM.txt
+
+/loopsVisible-

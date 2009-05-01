@@ -15,7 +15,7 @@ namespace NModel.Attributes
     /// error will occur.</para>
     /// <para>Only one [Domain] or [New] attribute may be used for a parameter.</para>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
     public sealed class DomainAttribute : Attribute
     {
         readonly private string name;

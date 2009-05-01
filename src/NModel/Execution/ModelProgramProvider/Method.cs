@@ -147,7 +147,12 @@ namespace NModel.Execution
         {
             if (!methodInfo.IsStatic)
             {
-                object[] attrs = methodInfo.DeclaringType.GetCustomAttributes(typeof(DomainAttribute), true);
+                object[] attrs = methodInfo.GetCustomAttributes(typeof(DomainAttribute), true);
+                if (attrs == null || attrs.Length == 0)
+                {
+                    // if no Domain attr at method level, look at the class level
+                    attrs = methodInfo.DeclaringType.GetCustomAttributes(typeof(DomainAttribute), true);
+                }
                 if (attrs != null && attrs.Length > 0)
                 {
                     DomainAttribute attr = (DomainAttribute)attrs[0];
@@ -162,9 +167,17 @@ namespace NModel.Execution
                         parameterGenerator = CreateDomainParameterGenerator(methodInfo, attr, methodInfo.DeclaringType);
                     return parameterGenerator;
                 }
-    
+
             }
-            return null;
+            else // if attribute applied to static method
+            {
+                object[] attrs = methodInfo.GetCustomAttributes(typeof(DomainAttribute), true);
+                if (attrs != null && attrs.Length > 0)
+                {
+                    throw new ModelProgramUserException("Domain attribute cannot be applied to a static method");
+                }
+            }
+            return null; // otherwise compiler complains
         }
 
         internal static ParameterGenerator[] GetInputParameterGenerators(MethodInfo methodInfo)

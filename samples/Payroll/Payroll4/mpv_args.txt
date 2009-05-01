@@ -1,0 +1,14 @@
+#--------------------------
+# Sample settings for mpv
+#--------------------------
+
+#
+# Referenced assemblies
+#
+/r:bin\\Payroll.dll
+
+/mp:Payroll
+
+/fsm:FSM.txt
+
+/loopsVisible-

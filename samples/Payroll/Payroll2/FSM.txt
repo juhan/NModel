@@ -1,0 +1,6 @@
+FSM(0, AcceptingStates(2), Transitions(
+             t(0, CreateEmployee(Employee(1)), 1),
+             t(1, CreateEmployee(Employee(2)), 2),
+             t(2, SetSalary(_, 0), 2),
+             t(2, SetSalary(_, 200), 2)),
+          Vocabulary("CreateEmployee", "SetSalary", "DeleteEmployee"))
