@@ -884,6 +884,15 @@ namespace NModel.Execution
             return abstractSorts.Contains(s);
         }
 
+        /// <summary>
+        /// Checks whether the field denoted by the index is a static field or a fieldmap. 
+        /// </summary>
+        /// <param name="i">Index of the field</param>
+        /// <returns>true if the field is static</returns>
+        public override bool IsFieldStatic(int i)
+        {
+            return stateFields[i].field.IsStatic;
+        }
 
         CompoundTerm CurrentStackFrame(IState state)
         {

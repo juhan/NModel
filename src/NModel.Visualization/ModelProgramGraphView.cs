@@ -359,7 +359,7 @@ namespace NModel.Visualization
                 // FSM fsm = FSM.Create("T(o1(),label2(),o2())", "T(o2(),label2(),o3())").Accept("o2()");
                 FSM fsm = FSM.Create(sc.ExtractFSM(state));
                 FsmModelProgram mp = new FsmModelProgram(fsm, this.selectedNode.ToString());
-                Visualization.ModelProgramGraphViewForm form = new ModelProgramGraphViewForm("State graph viewer", true);
+                Visualization.ModelProgramGraphViewForm form = new ModelProgramGraphViewForm("State graph viewer", false);
                 form.View.StateShape = StateShape.Box;
                 //form.View.SetModelProgram(mp);
                 form.View.SetStateMachine(fsm,null);

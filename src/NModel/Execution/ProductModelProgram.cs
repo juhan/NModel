@@ -553,7 +553,7 @@ namespace NModel.Execution
         /// <returns>Returns true if the sort corresponding to the symbol is abstract.</returns>
         public override bool IsSortAbstract(Symbol s)
         {
-            throw new NotImplementedException();
+            return m1.IsSortAbstract(s) || m2.IsSortAbstract(s);
         }
 
 

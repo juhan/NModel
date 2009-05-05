@@ -13,5 +13,5 @@
 
 /loopsVisible-
 
-/ExcludeIsomorphicStates+
-/CollapseExcludedIsomorphicStates+
+/excludeIsomorphicStates+
+/collapseExcludedIsomorphicStates+

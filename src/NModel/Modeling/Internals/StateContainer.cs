@@ -17,7 +17,7 @@ using Vertex = System.Int32;
 namespace NModel.Internals
 {
     /// <summary>
-    /// A mutable type for containing IStates during exploration. Has support for
+    /// A type for containing IStates during exploration. Has support for
     /// state isomorphism checking.
     /// </summary>    
     /// <typeparam name="T">The sort of element that implements <see cref="IState"/>.</typeparam>    
@@ -574,6 +574,64 @@ namespace NModel.Internals
         //    }
         //}
 
+        private void AnalyzeFieldMap(Term t, int i, bool p, VertexData rootData, Dictionary<Vertex, VertexData> vertexRecords)
+        {
+            Type tt = t.GetType();
+            if (tt != typeof(CompoundTerm))
+            {
+                throw new InvalidCastException("A field map should contain a CompoundTerm if not empty. " + t);
+            }
+            else //if (tt == typeof(CompoundTerm))
+            {
+                CompoundTerm ct = (CompoundTerm)t;
+                String symbolName = ct.Symbol.ShortName;
+
+                //int obj;
+
+                if (symbolName != BUILTIN_MAP)
+                    throw new InvalidCastException("A field map should contain a map, but contains: " + t);
+                else
+                {
+                    //Console.WriteLine("AnalyzeFieldMap: " + ct);
+
+
+                    // ct is a Map<LabeledInstance, IComparable>. The even argument may be anything
+                    // but the odd one is always an instance.
+                    // So, let pull out the vertex of the instance and do analyzeTerm with the 
+                    // next argument.
+                    // The edges should go to the orderedOutgoing.
+
+                    if (ct.Arguments.Count > 0) // we have a non-empty map with even arguments.
+                    {
+                        IEnumerator<Term> argEnumerator = ct.Arguments.GetEnumerator();
+                        while (argEnumerator.MoveNext())
+                        {
+                            CompoundTerm instance = (CompoundTerm)argEnumerator.Current;
+                            //Console.WriteLine(instance);
+                            Literal absLiteral = (Literal)instance.Arguments.Head;
+                            Vertex objId;
+                            objId = getAbstractOidIdentifier(instance.Symbol, absLiteral, ref abstractObjectIds);
+                            VertexData vd;
+                            //bool newVertex = false;
+                            if (!vertexRecords.TryGetValue(objId, out vd))
+                            {
+                                vd = new VertexData();
+                                vertexRecords.Add(objId, vd);
+
+                                //Console.WriteLine("We found an object instance from the Field Map that was "+
+                                //                        "not referenced from any of the static fields: "+instance);
+                                //Console.WriteLine("This might lead to disjoint graphs (not checked currently), thus the tracking message.");
+
+                            }
+                            argEnumerator.MoveNext();
+
+                            AnalyzeTerm(argEnumerator.Current, i,/*ordered*/ true, vd, vertexRecords);
+
+                        }
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Returns an integer that corresponds to previously seen object ID or returns a fresh id and stores the object ID.
@@ -607,6 +665,16 @@ namespace NModel.Internals
         }
 
 
+        internal struct StateAndMP
+        {
+            internal IState state;
+            internal ModelProgram modelProgram;
+            internal StateAndMP(IState s, ModelProgram m) {
+                state = s;
+                modelProgram = m;
+            }
+        }
+
         /// <summary>
         /// Extracts graph from the state. Currently supports only <see cref="SimpleState"/>, but adding
         /// <see cref="PairState"/> support is easy.
@@ -619,27 +687,78 @@ namespace NModel.Internals
             objectIdCounter = 0;
             abstractObjectIds = new Dictionary<Symbol, Dictionary<Literal, int>>();
             builtInIds = new Dictionary<Vertex, Symbol>();
-            SimpleState simple = state as SimpleState;
-            //Vertex root = new ObjectId(new Symbol("Root"), 1);
+            ModelProgram currentModelProgram = mp;
+
             Vertex root = ++objectIdCounter;
             if (preserveBuiltInIds)
                 builtInIds.Add(root, new Symbol("Root"));
             Dictionary<Vertex, VertexData> vertexRecords = new Dictionary<Vertex, VertexData>();
+            VertexData rootData = new VertexData();
+            rootData.label = rootData.label.Add(new Pair<CompoundTerm, IComparable>(CompoundTerm.Create("root"), 0));
+            rootData.vertex = root;
+            vertexRecords.Add(root, rootData);
+
+            T currentState = state;
+            SimpleState simple=null;
+            LinkedList<StateAndMP> stateList= new LinkedList<StateAndMP>();
+
+            PairState pair;
+            
+
+        Repeat:
+            // We assume that if we encounter a PairState
+            // then the mp is a ProductModelProgram.
+            // We need to track this for detecting static fields.
+            pair = currentState as PairState;
+
+            if (pair != null)
+            {
+                ProductModelProgram pmp = currentModelProgram as ProductModelProgram;
+                stateList.AddLast(new StateAndMP(pair.First, pmp.M1));
+                stateList.AddLast(new  StateAndMP(pair.Second, pmp.M2));
+
+            } else 
+                simple = currentState as SimpleState;
+            //Vertex root = new ObjectId(new Symbol("Root"), 1);
+
 
             if (simple != null)
             {
-                VertexData rootData = new VertexData();
-                rootData.label = rootData.label.Add(new Pair<CompoundTerm, IComparable>(CompoundTerm.Create("root"), 0));
+                //Dictionary<int, object> fieldMaps = new Dictionary<int, object>();
 
                 for (int i = 0; i < simple.LocationValuesCount; i++)
                 {
-                    Term t = simple.GetLocationValue(i);
-                    AnalyzeTerm(t, i, true, /* true, root, */ rootData, vertexRecords); // It is possible that a set is attached to an ordered outgoing edge. This is currently broken.
-
+                    //Console.WriteLine(i + " " + mp.IsFieldStatic(i));
+                    if (currentModelProgram.IsFieldStatic(i))
+                    {
+                        Term t = simple.GetLocationValue(i);
+                        AnalyzeTerm(t, i, true, /* true, root, */ rootData, vertexRecords); // It is possible that a set is attached to an ordered outgoing edge. This is currently broken.
+                    }
                 }
-                rootData.vertex = root;
-                vertexRecords.Add(root, rootData);
+                // We postpone dealing with field maps.
+                // We assume that every object is referenced via some data structure
+                // from some static field.
+                for (int i = 0; i < simple.LocationValuesCount; i++)
+                {
+                    if (!currentModelProgram.IsFieldStatic(i))
+                    {
+                        Term t = simple.GetLocationValue(i);
+                        AnalyzeFieldMap(t, i, true, rootData, vertexRecords);
+
+                    }
+                }
+
             }
+            simple = null;
+            
+            if (stateList.Count > 0) {
+                StateAndMP p = stateList.First.Value;
+                stateList.RemoveFirst();
+                currentState = (T)p.state;
+                currentModelProgram = p.modelProgram;
+                goto Repeat;
+            }
+ 
             //StringBuilder dot;
             //String[] fsm=printGraph(root, vertexRecords, out dot);
             RootedLabeledDirectedGraph g = new RootedLabeledDirectedGraph(root, vertexRecords);

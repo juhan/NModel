@@ -251,6 +251,17 @@ namespace NModel.Execution
         /// <returns>true if the sort is abstract, false otherwise.</returns>
         public abstract bool IsSortAbstract(Symbol s);
 
+        /// <summary>
+        /// Checks whether the field denoted by the index is a static field or a fieldmap.
+        /// This check is only valid with the <see cref="LibraryModelProgram"/> type.
+        /// </summary>
+        /// <param name="i">Index of the field</param>
+        /// <returns>true if the field is static</returns>
+        public virtual bool IsFieldStatic(int i)
+        {
+            throw new InvalidOperationException("IsFieldStatic is not implemented in the current context.");
+        }
+
     }
 
     /// <summary>

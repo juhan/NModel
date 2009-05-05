@@ -73,6 +73,7 @@
     <Compile Include="Algorithms\GraphTraversals\WCBM.cs" />
     <Compile Include="Algorithms\IEdge.cs" />
     <Compile Include="Algorithms\IVertex.cs" />
+    <Compile Include="Algorithms\Reachability.cs" />
     <Compile Include="Algorithms\OfflineTestGenerator.cs" />
     <Compile Include="Algorithms\Path.cs" />
     <Compile Include="Algorithms\PathNotFoundException.cs" />
