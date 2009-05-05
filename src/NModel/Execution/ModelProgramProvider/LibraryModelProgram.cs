@@ -142,6 +142,20 @@ namespace NModel.Execution
 
         #endregion
 
+        #region RequirementsMetrics
+
+        // Requirements metrics
+        private static Map<string, Set<Pair<string, string>>> allModeledRequirements = Map<string, Set<Pair<string, string>>>.EmptyMap;
+        /// <summary>
+        /// Returns all the requirements documents in the model
+        /// </summary>
+        public static Map<string, Set<Pair<string, string>>> AllModeledRequirements
+        {
+            get { return LibraryModelProgram.allModeledRequirements; }
+        }
+
+        #endregion
+
         #region Queries
         /// <summary>
         /// Get the model assembly
@@ -290,6 +304,32 @@ namespace NModel.Execution
                                 actionMethodNames = actionMethodNames.Add(methodInfo.Name);
 
                                 Method method = new Method(methodInfo);
+
+                                #region RequirementsMetrics2
+
+                                // Requirements metrics
+                                // methodInfo is only actions
+                                // Collect the requirements from the enabling-actions below (after this loop)
+                                if (!allModeledRequirements.ContainsKey(methodInfo.Name))
+                                    allModeledRequirements =
+                                        allModeledRequirements.Add(methodInfo.Name,
+                                        ReflectionHelper.GetRequirementsInMethod(methodInfo));
+
+                                // Collect the requirements from the enabling-actions
+                                foreach (MethodInfo enablingMethodInfo in ReflectionHelper.GetEnablingMethods(methodInfo))
+                                {
+                                    if (!allModeledRequirements.ContainsKey(enablingMethodInfo.Name))
+                                    {
+                                        Set<Pair<string, string>> requirements = new Set<Pair<string, string>>
+                                            (ReflectionHelper.GetEnablingMethodsRequirements(enablingMethodInfo));
+                                        allModeledRequirements =
+                                            allModeledRequirements.Add(enablingMethodInfo.Name, requirements);
+                                    }
+
+                                }
+
+                                #endregion
+
                                 foreach (ActionAttribute actionAttribute in ReflectionHelper.GetModelActionAttributes(methodInfo))
                                 {
                                     CompoundTerm/*?*/ startActionLabel;

@@ -1,0 +1,13 @@
+# response file for mpv arguments
+
+
+/r:../Model/bin/Debug/Model.dll
+
+/mp:RPSModel
+
+/safetyCheckIsOn+ 
+
+/livenessCheckIsOn+
+
+
+

@@ -1,0 +1,11 @@
+SetPlayer | SEC 3.1.1.5 | An input item must be an item from the following list: rock, paper, scissors
+
+SetPlayer | SEC 3.1.2.7 | A player types-in his/her chosen item to one of the text-boxes and clicks the relevant Submit button
+
+computeResults | SEC 3.2.1.1 | Items are resolved as follows: Rock blunts scissors; rock wins. Paper covers or captures rock; paper wins. Scissors cut paper; scissors wins. If both players choose the same item, the game is tied
+
+ReadResults | SEC 5.4.3.1 | This requirement is not in the test suite
+
+NotImplemented | SEC 7.1.2.1 | This requirement is in the test suite but not executed
+
+SetPlayer | SEC 0.1.2.3 | Added requirement to a guard method

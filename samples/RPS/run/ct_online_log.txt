@@ -1,0 +1,96 @@
+TestResult(0, Verdict("Failure"), "Action 'ReadLastResult_Finish(\"Player2 wins\")' not enabled in the model
+Unexpected return value of finish action, expected: ReadLastResult_Finish("Error: wrong input!")
+Unexpected finish action",
+    Executed Requirements (
+        sec 3.2.1.1 - items are resolved as follows: rock blunts scissors; rock wins. paper covers or captures rock; paper wins. scissors cut paper; scissors wins. if both players choose the same item, the game is tied (1 time),
+        sec 0.1.2.3 - added requirement to a guard method (1 time),
+        sec 3.1.2.7 - a player types-in his/her chosen item to one of the text-boxes and clicks the relevant submit button (1 time),
+        sec 3.1.1.5 - an input item must be an item from the following list: rock, paper, scissors (1 time)
+    ),
+    Trace(
+        SetPlayer2("paper"),
+        SetPlayer1("wrongInput"),
+        ReadLastResult_Start(),
+        ReadLastResult_Finish("Player2 wins")
+    )
+TestResult(1, Verdict("Failure"), "Action 'ReadLastResult_Finish(\"Player2 wins\")' not enabled in the model
+Unexpected return value of finish action, expected: ReadLastResult_Finish("Error: wrong input!")
+Unexpected finish action",
+    Executed Requirements (
+        sec 3.2.1.1 - items are resolved as follows: rock blunts scissors; rock wins. paper covers or captures rock; paper wins. scissors cut paper; scissors wins. if both players choose the same item, the game is tied (1 time),
+        sec 0.1.2.3 - added requirement to a guard method (1 time),
+        sec 3.1.2.7 - a player types-in his/her chosen item to one of the text-boxes and clicks the relevant submit button (1 time),
+        sec 3.1.1.5 - an input item must be an item from the following list: rock, paper, scissors (1 time)
+    ),
+    Trace(
+        SetPlayer1("wrongInput"),
+        SetPlayer2("rock"),
+        ReadLastResult_Start(),
+        ReadLastResult_Finish("Player2 wins")
+    )
+TestResult(2, Verdict("Success"), "",
+    Executed Requirements (
+        sec 3.2.1.1 - items are resolved as follows: rock blunts scissors; rock wins. paper covers or captures rock; paper wins. scissors cut paper; scissors wins. if both players choose the same item, the game is tied (1 time),
+        sec 0.1.2.3 - added requirement to a guard method (1 time),
+        sec 3.1.2.7 - a player types-in his/her chosen item to one of the text-boxes and clicks the relevant submit button (1 time),
+        sec 3.1.1.5 - an input item must be an item from the following list: rock, paper, scissors (1 time)
+    ),
+    Trace(
+        SetPlayer1("rock"),
+        SetPlayer2("rock"),
+        ReadLastResult_Start(),
+        ReadLastResult_Finish("Tie")
+    )
+TestResult(3, Verdict("Failure"), "Action 'ReadLastResult_Finish(\"Player2 wins\")' not enabled in the model
+Unexpected return value of finish action, expected: ReadLastResult_Finish("Error: wrong input!")
+Unexpected finish action",
+    Executed Requirements (
+        sec 3.2.1.1 - items are resolved as follows: rock blunts scissors; rock wins. paper covers or captures rock; paper wins. scissors cut paper; scissors wins. if both players choose the same item, the game is tied (1 time),
+        sec 0.1.2.3 - added requirement to a guard method (1 time),
+        sec 3.1.2.7 - a player types-in his/her chosen item to one of the text-boxes and clicks the relevant submit button (1 time),
+        sec 3.1.1.5 - an input item must be an item from the following list: rock, paper, scissors (1 time)
+    ),
+    Trace(
+        SetPlayer1("wrongInput"),
+        SetPlayer2("rock"),
+        ReadLastResult_Start(),
+        ReadLastResult_Finish("Player2 wins")
+    )
+TestResult(4, Verdict("Success"), "",
+    Executed Requirements (
+        sec 3.2.1.1 - items are resolved as follows: rock blunts scissors; rock wins. paper covers or captures rock; paper wins. scissors cut paper; scissors wins. if both players choose the same item, the game is tied (1 time),
+        sec 0.1.2.3 - added requirement to a guard method (1 time),
+        sec 3.1.2.7 - a player types-in his/her chosen item to one of the text-boxes and clicks the relevant submit button (1 time),
+        sec 3.1.1.5 - an input item must be an item from the following list: rock, paper, scissors (1 time)
+    ),
+    Trace(
+        SetPlayer2("paper"),
+        SetPlayer1("scissors"),
+        ReadLastResult_Start(),
+        ReadLastResult_Finish("Player1 wins")
+    )
+Test Metrics(
+    General Summary(
+         5 tests Executed,
+         3 tests Failed,
+         Pass Rate: 40.0%
+    ),
+    Failed Actions(
+         (ReadLastResult_Finish, Reason: Action 'ReadLastResult_Finish(\"Player2 wins\")' not enabled in the model
+Unexpected return value of finish action, expected: ReadLastResult_Finish("Error: wrong input!")
+Unexpected finish action( 3 times ))
+    ),
+    83.3% requirements coverage by test suite,
+    Not covered requirements by test suite(
+         sec 5.4.3.1 - this requirement is not in the test suite
+    ),
+    80.0% of the covered requirements have been executed,
+    Covered requirements that have not been executed(
+         sec 7.1.2.1 - this requirement is in the test suite but not executed
+    ),
+    Toatal time spent in each action(
+         SetPlayer1(Executed 5 times, Average execution time: 00:00:00.4050000) : 00:00:02.0280000,
+         ReadLastResult_Start(Executed 5 times, Average execution time: 00:00:00.2020000) : 00:00:01.0140000,
+         SetPlayer2(Executed 5 times, Average execution time: 00:00:00.4080000) : 00:00:02.0436000
+    )
+)

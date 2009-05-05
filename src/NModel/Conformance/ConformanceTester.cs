@@ -8,7 +8,7 @@ using System.Threading;
 using NModel;
 using NModel.Terms;
 using NModel.Algorithms;
-using NModel.Execution; 
+using NModel.Execution;
 
 using Action = NModel.Terms.CompoundTerm;
 using ActionSymbol = NModel.Terms.Symbol;
@@ -94,14 +94,32 @@ namespace NModel.Conformance
                 while ((runsCnt <= 0) || run < runsCnt)
                 {
                     TestResult testResult = RunTestCase(run);
+
+                    // Tests results summary metrics
+                    if (testResult.verdict == Verdict.Failure)
+                        ++totalFailedTests;
+
+                    // Requirements metrics 
+                    totalExecutedRequirements = totalExecutedRequirements.Union(testResult.executedRequirements);
+
                     if (!this.testResultNotifier(testResult))
                     {
                         Reset();
+
+                        //Metrics
+                        AddMetricsToEndOfLog();
+
                         return;
                     }
                     Reset();
                     run += 1;
+
+                    // Tests results summary metrics
+                    totalExecutedTests = run;
                 }
+
+                // Metrics 
+                AddMetricsToEndOfLog();
             }
             catch (Exception e)
             {
@@ -113,11 +131,11 @@ namespace NModel.Conformance
                 }
                 throw new ConformanceTesterException("Run failed. " + e.Message);
             }
-            finally 
+            finally
             {
                 //dispose of the worker thread pool
                 worker.Dispose();
-                if (reset) 
+                if (reset)
                     Reset();
                 worker = null;
             }
@@ -134,6 +152,9 @@ namespace NModel.Conformance
         {
             Sequence<Action> testCase = Sequence<Action>.EmptySequence;
             Action/*?*/ o = null;
+
+            // Requirements metrics
+            Bag<Pair<string, string>> executedRequirements = Bag<Pair<string, string>>.EmptyBag;
 
             while ((this.stepsCnt <= 0) || testCase.Count < stepsCnt || (!model.IsInAcceptingState && (maxStepsCnt <= 0 || testCase.Count < maxStepsCnt)))
             {
@@ -152,7 +173,7 @@ namespace NModel.Conformance
                         o = null;                    //consume the action
                     }
                     else
-                        return new TestResult(testNr, Verdict.Failure, failureReason, testCase);
+                        return new TestResult(testNr, Verdict.Failure, failureReason, testCase, executedRequirements); // Requirements metrics: ", executedRequirements"
                     #endregion
                 }
                 else
@@ -175,6 +196,24 @@ namespace NModel.Conformance
                         //do the action in the model
                         model.DoAction(testerAction);
 
+                        // Requirements metrics
+
+                        string actionName = testerAction.Name;
+                        foreach (string methodName in LibraryModelProgram.AllModeledRequirements.Keys)
+                        {
+                            // The methods names don't contain "_Start"
+                            // when testerAction.Name == actionName_Start, remove the "_Start"
+                            // in order to check it in AllModeledRequirements.Keys 
+                            if (actionName.Contains("_Start"))
+                                actionName = actionName.Replace("_Start", "");
+                            // I use 'Contains' to get all the enabled actions as well
+                            if (methodName.Contains(actionName))
+                            {
+                                foreach (Pair<string, string> req in LibraryModelProgram.AllModeledRequirements[methodName])
+                                    executedRequirements = executedRequirements.Add(req);
+                            }
+                        }
+
                         //record the action in the testCase
                         testCase = testCase.AddLast(testerAction);
 
@@ -183,11 +222,16 @@ namespace NModel.Conformance
                         {
                             try
                             {
+                                DateTime startAction = DateTime.Now; // Performance metrics
+
                                 o = DoAction(testerAction, t); //if return value is non-null it will be checked next time around
+
+                                // Requirements metrics
+                                CalcPerformance(testerAction, startAction);
                             }
                             catch (ConformanceTesterException e)
                             {
-                                return new TestResult(testNr, Verdict.Failure, e.Message, testCase);  //conformance failure
+                                return new TestResult(testNr, Verdict.Failure, e.Message, testCase, executedRequirements);  //conformance failure // Requirements : ", executedRequirements"
                             }
                         }
                         #endregion
@@ -202,15 +246,15 @@ namespace NModel.Conformance
                             int obsTimeout = (w == null ? 0 : (int)w[0]);
                             if (w != null)
                             {
-                                testCase = testCase.AddLast(w); 
+                                testCase = testCase.AddLast(w);
                                 model.DoAction(w);
                             }
-                            if (!observations.TryDequeue(new TimeSpan(0,0,0,0,obsTimeout), out o))
+                            if (!observations.TryDequeue(new TimeSpan(0, 0, 0, 0, obsTimeout), out o))
                             {
                                 //if there are no tester actions and no observables but the 
                                 //model is in accepting state, the test succeeds
                                 if (model.IsInAcceptingState)
-                                    return new TestResult(testNr, Verdict.Success, "", testCase);
+                                    return new TestResult(testNr, Verdict.Success, "", testCase, executedRequirements);// Requirements metrics: ", executedRequirements"
                                 else
                                     o = timeoutAction;
                             }
@@ -220,17 +264,17 @@ namespace NModel.Conformance
                             //if there are no tester actions and no observables but the 
                             //model is in accepting state, the test succeeds
                             if (model.IsInAcceptingState)
-                                return new TestResult(testNr, Verdict.Success, "", testCase);
-                            else 
-                                return new TestResult(testNr, Verdict.Failure, "Run stopped in a non-accepting state", testCase);
+                                return new TestResult(testNr, Verdict.Success, "", testCase, executedRequirements);// Requirements metrics: ", executedRequirements"
+                            else
+                                return new TestResult(testNr, Verdict.Failure, "Run stopped in a non-accepting state", testCase, executedRequirements);// Requirements metrics: ", executedRequirements"
                         }
                     }
                 }
             }
             if (model.IsInAcceptingState)
-                return new TestResult(testNr, Verdict.Success, "", testCase);
+                return new TestResult(testNr, Verdict.Success, "", testCase, executedRequirements);// Requirements metrics: ", executedRequirements"
             else
-                return new TestResult(testNr, Verdict.Failure, "Test run did not finish in accepting state", testCase);
+                return new TestResult(testNr, Verdict.Failure, "Test run did not finish in accepting state", testCase, executedRequirements);// Requirements metrics: ", executedRequirements"
         }
 
 
@@ -245,7 +289,7 @@ namespace NModel.Conformance
                 Action implAction = ((IStepper)args[0]).DoAction((Action)args[1]);
                 ((ImplementationResultWrapper)args[2]).implAction = implAction;
             }
-            
+
             catch (Exception e)
             {
                 ((ImplementationResultWrapper)args[2]).exception = e;
@@ -264,6 +308,7 @@ namespace NModel.Conformance
             if (!ok)
             {
                 //CallTheImplementationThread.Abort();
+
                 throw new ConformanceTesterException("Action timed out");  //conformance failure
             }
             else
@@ -317,13 +362,14 @@ namespace NModel.Conformance
         /// <summary>
         /// Create a conformance tester exception with a given message and given inner exception
         /// </summary>
-        public ConformanceTesterException(string message, Exception innerException) :
-            base(message,innerException)
+        public ConformanceTesterException(string message, Exception innerException)
+            :
+            base(message, innerException)
         {
         }
 
         private ConformanceTesterException(System.Runtime.Serialization.SerializationInfo si, System.Runtime.Serialization.StreamingContext sc)
-            : base(si,sc)
+            : base(si, sc)
         {
         }
 

@@ -83,10 +83,12 @@
     <Compile Include="Algorithms\TimedWorker.cs" />
     <Compile Include="Conformance\ConformanceTester.cs" />
     <Compile Include="Conformance\ConformanceTesterCommandLine.cs" />
+    <Compile Include="Conformance\ConformanceTesterMetrics.cs" />
     <Compile Include="Conformance\ConformanceTesterSettings.cs" />
     <Compile Include="Conformance\CoveragePointProvider.cs" />
     <Compile Include="Conformance\IStrategy.cs" />
     <Compile Include="Conformance\IStepper.cs" />
+    <Compile Include="Conformance\LogMetrics.cs" />
     <Compile Include="Conformance\Strategy.cs" />
     <Compile Include="Conformance\StrategyWithCoverage.cs" />
     <Compile Include="Conformance\TestResult.cs" />

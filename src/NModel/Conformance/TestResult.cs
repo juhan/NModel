@@ -40,6 +40,12 @@ namespace NModel.Conformance
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         readonly public Sequence<Action> trace;
 
+        // Requirements metrics
+        /// <summary>
+        /// A Bag that contains all the executed requirements during this test-case run
+        /// </summary>
+        readonly public Bag<Pair<string, string>> executedRequirements = Bag<Pair<string, string>>.EmptyBag;
+
         /// <summary>
         /// Constructs a test case result
         /// </summary>
@@ -47,26 +53,29 @@ namespace NModel.Conformance
         /// <param name="verdict">verdict of the test case</param>
         /// <param name="trace">actions of the test case</param>
         /// <param name="reason">failure reason</param>
-        public TestResult(int testNr, Verdict verdict, string reason, Sequence<Action> trace)
+        /// <param name="executedRequirements">executed requirements</param>
+        public TestResult(int testNr, Verdict verdict, string reason, Sequence<Action> trace, Bag<Pair<string, string>> executedRequirements) // Requirements metrics: ", Sequence<string> executedRequirements"
         {
             this.testNr = testNr;
             this.verdict = verdict;
             this.trace = trace;
             this.reason = reason;
+            this.executedRequirements = executedRequirements;
         }
     }
 
     /// <summary>
     /// Verdict of a test case
     /// </summary>
-    public enum Verdict { 
+    public enum Verdict
+    {
         /// <summary>
         /// Successful test case
         /// </summary>
-        Success, 
+        Success,
         /// <summary>
         /// Failed test case
         /// </summary>
-        Failure 
+        Failure
     }
 }

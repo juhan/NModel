@@ -104,7 +104,7 @@ namespace NModel.Utilities
         {
             if (fullName == null)
                 throw new ArgumentNullException("fullName");
-            
+
             int k = fullName.LastIndexOf(".");
             if (k <= 0 || k >= fullName.Length - 1)
                 throw new ModelProgramUserException("Not a valid fully qualified static method name '" + fullName + "'.");
@@ -176,7 +176,7 @@ namespace NModel.Utilities
         /// <param name="s">The string</param>
         /// <returns>The trimmed string</returns>
         static string TrimDigits(string s)
-        {            
+        {
             return s.TrimEnd(digits);
         }
 
@@ -206,12 +206,12 @@ namespace NModel.Utilities
 
                     if (!methodInfo.ReturnType.Equals(typeof(bool)))
                         throw new ModelProgramUserException("Enabling condition " + enablingConditionName + " must have Boolean return type");
-                    
+
                     if (!ReflectionHelper.ParametersArePrefix(methodInfo, inputParameterTypes))
                         throw new ModelProgramUserException("Enabling condition " + enablingConditionName + " does not match the input parameter types of " + actionMethod.Name);
-                        
-                    yield return methodInfo;                       
-                }               
+
+                    yield return methodInfo;
+                }
             }
         }
 
@@ -227,6 +227,64 @@ namespace NModel.Utilities
                     if (null != attr)
                         documentationStrings.Add(((RequirementAttribute)attr).Documentation);
             return documentationStrings.ToArray();
+        }
+
+        // Requirements metrics     
+
+        /// <summary>
+        /// Get ids and descriptions of all requirement attributes attached to the member info.
+        /// </summary>
+        public static Pair<string, string>[] GetEnablingMethodsRequirements(MemberInfo method)
+        {
+            List<Pair<string, string>> reqs = new List<Pair<string, string>>();
+            object[] attrs = method.GetCustomAttributes(typeof(RequirementAttribute), true);
+            if (attrs != null)
+                foreach (object attr in attrs)
+                    if (null != attr)
+                        reqs.Add(new Pair<string, string>(
+                            ((RequirementAttribute)attr).Id, ((RequirementAttribute)attr).Documentation));
+            return reqs.ToArray();
+        }
+
+        /// <summary>
+        /// Return the enabling methods for a given action-method
+        /// </summary>
+        /// <param name="actionMethod"></param>
+        /// <returns></returns>
+        public static IEnumerable<MethodInfo> GetEnablingMethods(MethodInfo actionMethod)
+        {
+            Type t = actionMethod.DeclaringType;
+            string enablingConditionName = actionMethod.Name + "Enabled";
+
+            foreach (MethodInfo methodInfo in t.GetMethods(modelBindingFlags))
+            {
+                string trimmedMethodName = ReflectionHelper.TrimDigits(methodInfo.Name);
+                if (string.Equals(trimmedMethodName, enablingConditionName))
+                {
+                    if (ReflectionHelper.HasActionAttribute(methodInfo))
+                        throw new ModelProgramUserException("Enabling condition " + enablingConditionName + " must not have an [Action] attribute.");
+
+                    if (!methodInfo.ReturnType.Equals(typeof(bool)))
+                        throw new ModelProgramUserException("Enabling condition " + enablingConditionName + " must have Boolean return type");
+
+                    yield return methodInfo;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get ids and descriptions of all requirement attributes attached to the member info.
+        /// </summary>
+        public static Set<Pair<string, string>> GetRequirementsInMethod(MemberInfo method)
+        {
+            Set<Pair<string, string>> methodReqs = Set<Pair<string, string>>.EmptySet;
+            object[] attrs = method.GetCustomAttributes(typeof(RequirementAttribute), true);
+            if (attrs != null)
+                foreach (object attr in attrs)
+                    if (null != attr)
+                        methodReqs = methodReqs.Add(new Pair<string, string>(
+                            ((RequirementAttribute)attr).Id, ((RequirementAttribute)attr).Documentation));
+            return methodReqs;
         }
 
         /// <summary>
@@ -248,7 +306,7 @@ namespace NModel.Utilities
                 if (!Object.Equals(types[i], inputParameterTypes[i]))
                     return false;
             }
-            return true;            
+            return true;
         }
 
         /// <summary>
@@ -306,7 +364,7 @@ namespace NModel.Utilities
         {
             get { return ReflectionHelper.hiddenVars; }
         }
-        
+
 
         /// <summary>
         /// Is the field a model variable?
@@ -429,7 +487,7 @@ namespace NModel.Utilities
                         return true;
                     }
                 }
-            }          
+            }
         }
 
         /// <summary>
@@ -457,7 +515,7 @@ namespace NModel.Utilities
                 else
                     throw new ModelProgramUserException("can't have finish property " + actionAttribute.Finish +
                                                         " in [Action] attribute without matching Start property");
-                 
+
 
             bool isAtomic = ReflectionHelper.HasNoOutputs(method) && string.IsNullOrEmpty(actionAttribute.Finish);
 
@@ -472,12 +530,12 @@ namespace NModel.Utilities
                                                (isAtomic ? baseName : (baseName + "_Start")));
 
             string[] inputParameterNames = GetInputParameterNames(method);
-            startActionLabel = GetActionTerm(startActionString, inputParameterNames, true, Set<string>.EmptySet);             
-            
+            startActionLabel = GetActionTerm(startActionString, inputParameterNames, true, Set<string>.EmptySet);
+
 
             if (!isAtomic)
             {
-                string finishActionString = (!string.IsNullOrEmpty(actionAttribute.Finish) ? 
+                string finishActionString = (!string.IsNullOrEmpty(actionAttribute.Finish) ?
                                                  actionAttribute.Finish : baseName + "_Finish");
 
                 Set<string> optionalArguments = new Set<string>(inputParameterNames);
@@ -486,7 +544,7 @@ namespace NModel.Utilities
             else
             {
                 finishActionLabel = null;
-            }               
+            }
         }
 
         static Set<string> GetUnusedArguments(Set<string> defaultArguments, CompoundTerm action)
@@ -498,14 +556,14 @@ namespace NModel.Utilities
                 {
                     Variable v = arg as Variable;
                     if (null == v)
-                       throw new ModelProgramUserException("invalid argument for action " + action.ToString() +
-                             ": " + arg.ToString());
-                   string name = v.ToString();
-                   if (!defaultArguments.Contains(name))
-                       throw new ModelProgramUserException("invalid (possibly misspelled) argument for action " + action.ToString() +
-                             ": " + arg.ToString() + ". Must be one of " + defaultArguments.ToString() + ".");
+                        throw new ModelProgramUserException("invalid argument for action " + action.ToString() +
+                              ": " + arg.ToString());
+                    string name = v.ToString();
+                    if (!defaultArguments.Contains(name))
+                        throw new ModelProgramUserException("invalid (possibly misspelled) argument for action " + action.ToString() +
+                              ": " + arg.ToString() + ". Must be one of " + defaultArguments.ToString() + ".");
 
-                   result = result.Remove(name);
+                    result = result.Remove(name);
                 }
             }
             return result;
@@ -589,13 +647,13 @@ namespace NModel.Utilities
         {
             List<Type> pTypes = new List<Type>();
 
-            if (!methodInfo.IsStatic)            
+            if (!methodInfo.IsStatic)
                 pTypes.Add(methodInfo.DeclaringType);
-            
+
             foreach (ParameterInfo pInfo in methodInfo.GetParameters())
             {
                 Type pType = pInfo.ParameterType;
-                if (ReflectionHelper.IsInputParameter(pInfo)) 
+                if (ReflectionHelper.IsInputParameter(pInfo))
                     pTypes.Add(pType.IsByRef ? pType.GetElementType() : pType);
             }
             return pTypes.ToArray();
@@ -641,7 +699,7 @@ namespace NModel.Utilities
                 Type pType = pInfo.ParameterType;
                 bool isByRef = pType.IsByRef;
 
-                if (IsOutputParameter(pInfo)) 
+                if (IsOutputParameter(pInfo))
                     pTypes.Add(isByRef ? pType.GetElementType() : pType);
             }
 
@@ -663,7 +721,7 @@ namespace NModel.Utilities
 
             foreach (ParameterInfo pInfo in methodInfo.GetParameters())
             {
-               if (ReflectionHelper.IsOutputParameter(pInfo))
+                if (ReflectionHelper.IsOutputParameter(pInfo))
                     parameterNames.Add(pInfo.Name);
             }
             return parameterNames.ToArray();
@@ -725,7 +783,7 @@ namespace NModel.Utilities
 
             return parameterIndices.ToArray();
         }
-  
+
 
         /// <summary>
         /// Computes the mapping from the parameter positions of the action label to the 

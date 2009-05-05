@@ -182,6 +182,39 @@ namespace NModel.Conformance
                 }
                 #endregion
 
+
+                // Requirements metrics
+
+                #region load all the requirements from an external file - if any
+                if (!String.IsNullOrEmpty(settings.RequirementsFile))
+                {
+                    try
+                    {
+                        System.IO.StreamReader reqsReader =
+                            new System.IO.StreamReader(settings.RequirementsFile);
+                        string line;
+                        char[] splitchars = { '|' };
+                        string[] splitedLine;
+                        while ((line = reqsReader.ReadLine()) != null)
+                        {
+                            if (line.Length > 5)
+                            {
+                                splitedLine = line.Split(splitchars);
+                                // The format of a requirement line is:
+                                // action (ignore by the parser) | id | description
+                                AllRequirements.Add(new KeyValuePair<string, string>(splitedLine[1].Trim().ToLower(), splitedLine[2].Trim().ToLower()));
+                            }
+                        }
+                        reqsReader.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        throw new ModelProgramUserException("Cannot create all-requirements list: " + e.Message);
+                    }
+                }
+                #endregion
+
+
                 if (mp == null && testcases.IsEmpty && fsms.Count == 0)
                 {
                     throw new ModelProgramUserException("No model, fsm, or test suite was given.");
@@ -208,7 +241,7 @@ namespace NModel.Conformance
                 }
                 else
                 {
-                    ms = CreateModelStepper(libs, mp, settings.modelStepper, settings.coverage,obs);
+                    ms = CreateModelStepper(libs, mp, settings.modelStepper, settings.coverage, obs);
                 }
 
                 #endregion
@@ -223,11 +256,12 @@ namespace NModel.Conformance
                 confTester.RunsCnt = (testcases.IsEmpty ? settings.runs : testcases.Count);
                 confTester.WaitAction = settings.waitAction;
                 confTester.TimeoutAction = settings.timeoutAction;
+                confTester.ShowTestCaseCoveredRequirements = settings.showTestCaseCoveredRequirements;
 
                 Symbol waitActionSymbol = confTester.waitActionSet.Choose();
                 Symbol timeoutActionSymbol = confTester.timeoutAction.Symbol;
 
- 
+
                 confTester.ObservableActionSymbols = obs;
 
                 Set<Symbol> cleanup = new Set<string>(settings.cleanupAction).Convert<Symbol>(delegate(string s) { return Symbol.Parse(s); });
@@ -236,7 +270,7 @@ namespace NModel.Conformance
                 if (confTester.IsAsync)
                 {
                     //remove the wait and timeout action symbol from tester action symbols
-                    if (confTester.testerActionSymbols.Contains(waitActionSymbol) || 
+                    if (confTester.testerActionSymbols.Contains(waitActionSymbol) ||
                         confTester.testerActionSymbols.Contains(timeoutActionSymbol))
                         confTester.testerActionSymbols =
                             confTester.testerActionSymbols.Remove(waitActionSymbol).Remove(timeoutActionSymbol);
@@ -277,8 +311,8 @@ namespace NModel.Conformance
             }
         }
 
-        private static IStrategy CreateModelStepper(List<Assembly> libs, ModelProgram mp, 
-            string/*?*/ msName, string[]/*?*/ coverage,Set<Symbol> obs)
+        private static IStrategy CreateModelStepper(List<Assembly> libs, ModelProgram mp,
+            string/*?*/ msName, string[]/*?*/ coverage, Set<Symbol> obs)
         {
             //if no model stepper name is provided, use the default one and ignore coverage
             if (msName == null)
@@ -337,6 +371,8 @@ namespace NModel.Conformance
             startTestAction = "Test";
             waitAction = "Wait";
             timeoutAction = "Timeout";
+            RequirementsFile = null; // Requirements metrics
+            showTestCaseCoveredRequirements = false; // Show requirements coverage per test-case ?
         }
 
         [Argument(ArgumentType.Required, ShortName = "", HelpText = "Implementation under test, a fully qualified name of a factory method that returns an object that implements IStepper.")]
@@ -404,5 +440,15 @@ namespace NModel.Conformance
 
         [Argument(ArgumentType.LastOccurenceWins, ShortName = "", DefaultValue = "Timeout", HelpText = "A name of an action that happens when a wait action has been executed and no obsevable action occurred within the time limit provided in the wait action. A timeout action is observable and takes no arguments. Only used with IAsyncStepper.")]
         public string timeoutAction;
+
+        // Requirements metrics
+
+        // The format of a requirement line is:
+        // action (ignore by the parser) | id | description
+        [Argument(ArgumentType.AtMostOnce, ShortName = "req", HelpText = "File containing the requirements for checking execution coverage.")]
+        public string RequirementsFile;
+
+        [Argument(ArgumentType.LastOccurenceWins, ShortName = "tcreq", DefaultValue = false, HelpText = "Show Test Case Covered Requirements.")]
+        public bool showTestCaseCoveredRequirements = false;
     }
 }

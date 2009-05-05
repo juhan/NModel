@@ -34,7 +34,6 @@ namespace NModel.Conformance
 
     partial class ConformanceTester
     {
-
         #region TestResultNotifier
         /// <summary>
         /// Test result delegate that is called each time a test run is completed.
@@ -61,11 +60,20 @@ namespace NModel.Conformance
 
         bool DefaultTestResultNotifier(TestResult testResult)
         {
+
+            // Failed actions metrics
+            AddFailedActionsWithMessages(testResult);
+
             using (StreamWriter sw = GetStreamWriter())
             {
                 WriteLine(sw, "TestResult(" + testResult.testNr + ", "
                                                 + "Verdict(\"" + testResult.verdict + "\"), \""
                                                 + testResult.reason + "\",");
+
+                // Requirements metrics
+                if (showTestCaseCoveredRequirements == true)
+                    AddExecutedRequirementsToTest(testResult, sw);
+
                 WriteLine(sw, "    Trace(");
                 for (int i = 0; i < testResult.trace.Count; i++)
                 {
@@ -74,7 +82,6 @@ namespace NModel.Conformance
 
                 }
                 WriteLine(sw, "    )");
-                WriteLine(sw, ")");
             }
             if (!this.continueOnFailure)
             {
@@ -355,7 +362,7 @@ namespace NModel.Conformance
         /// </summary>
         public string WaitAction
         {
-            get 
+            get
             {
                 return waitActionSet.Choose().Name;
             }
@@ -393,7 +400,7 @@ namespace NModel.Conformance
         }
         #endregion
 
-        bool logFileWasAlreadyOpened; 
+        bool logFileWasAlreadyOpened;
 
         StreamWriter GetStreamWriter()
         {
