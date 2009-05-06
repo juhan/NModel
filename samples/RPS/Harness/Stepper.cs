@@ -89,7 +89,7 @@ namespace WinFormHarness
         // (when a timeout occured without test-case action)
         static void exitAppInTimeout()
         {
-            if (!wh.WaitOne(1000)) // Wait for notification, returns false when timeout
+            if (!wh.WaitOne(1000, false)) // Wait for notification, returns false when timeout
             {
                 Console.WriteLine("\nTest run stopped. Exit the implementation for the last time");                
                 runner.closeImplWindow();                

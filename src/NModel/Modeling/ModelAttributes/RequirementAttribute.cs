@@ -13,8 +13,11 @@ namespace NModel.Attributes
     /// error contexts such as conformance failures and state invariant violations. They can also be 
     /// used to check for coverage of requirements. More than one [Requirement] attribute may be
     /// provided for any entity.
+    /// 
+    /// In order to use the Requirements metrics,
+    /// the requirements attributed should only be added to action and guard(enabled) methods!
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
     public sealed class RequirementAttribute : Attribute
     {
         readonly string id;
