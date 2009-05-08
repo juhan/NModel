@@ -20,6 +20,7 @@ namespace NModel.Attributes
     [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
     public sealed class RequirementAttribute : Attribute
     {
+        private static int _nextId = 1;
         readonly string id;
         private static Set<Pair<string, string>> _allRequirementsInModels = Set<Pair<string, string>>.EmptySet;
 
@@ -34,13 +35,28 @@ namespace NModel.Attributes
         readonly string documentation;
 
         /// <summary>
-        /// Constructor of the [Requirement] attribute.
+        /// Constructor of the [Requirement] attribute that gets 2 strings.
+        /// First: ID, Second: Description
         /// </summary>        
         /// <param name="id">The requirement id.</param>  
         /// <param name="documentation">The requirement description.</param>
         public RequirementAttribute(string id, string documentation)
         {
             this.id = id.Trim().ToLower();
+            this.documentation = documentation.Trim().ToLower();
+            _allRequirementsInModels = _allRequirementsInModels.Add(
+                new Pair<string, string>(this.id, this.documentation));
+        }
+
+        /// <summary>
+        /// Constructor of the [Requirement] attribute that gets 1 string.
+        /// String: Description
+        /// </summary>        
+        /// <param name="documentation">The requirement description.</param>
+        public RequirementAttribute(string documentation)
+        {
+            this.id = Convert.ToString(_nextId);
+            _nextId = _nextId + 1;
             this.documentation = documentation.Trim().ToLower();
             _allRequirementsInModels = _allRequirementsInModels.Add(
                 new Pair<string, string>(this.id, this.documentation));
