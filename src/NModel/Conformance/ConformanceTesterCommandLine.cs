@@ -257,6 +257,7 @@ namespace NModel.Conformance
                 confTester.WaitAction = settings.waitAction;
                 confTester.TimeoutAction = settings.timeoutAction;
                 confTester.ShowTestCaseCoveredRequirements = settings.showTestCaseCoveredRequirements;
+                confTester.showMetrics = settings.showMetrics;
 
                 Symbol waitActionSymbol = confTester.waitActionSet.Choose();
                 Symbol timeoutActionSymbol = confTester.timeoutAction.Symbol;
@@ -372,7 +373,8 @@ namespace NModel.Conformance
             waitAction = "Wait";
             timeoutAction = "Timeout";
             RequirementsFile = null; // Requirements metrics
-            showTestCaseCoveredRequirements = false; // Show requirements coverage per test-case ?
+            showTestCaseCoveredRequirements = false; // Show requirements coverage per test-case?
+            showMetrics = false; // Show metrics in the ct log?
         }
 
         [Argument(ArgumentType.Required, ShortName = "", HelpText = "Implementation under test, a fully qualified name of a factory method that returns an object that implements IStepper.")]
@@ -441,6 +443,10 @@ namespace NModel.Conformance
         [Argument(ArgumentType.LastOccurenceWins, ShortName = "", DefaultValue = "Timeout", HelpText = "A name of an action that happens when a wait action has been executed and no obsevable action occurred within the time limit provided in the wait action. A timeout action is observable and takes no arguments. Only used with IAsyncStepper.")]
         public string timeoutAction;
 
+        // Metrics
+        [Argument(ArgumentType.LastOccurenceWins, ShortName = "metrics", DefaultValue = false, HelpText = "Show test-suite metrics at the end of the ct log?")]
+        public bool showMetrics = false;
+        
         // Requirements metrics
 
         // The format of a requirement line is:
@@ -448,7 +454,7 @@ namespace NModel.Conformance
         [Argument(ArgumentType.AtMostOnce, ShortName = "req", HelpText = "File containing the requirements for checking execution coverage.")]
         public string RequirementsFile;
 
-        [Argument(ArgumentType.LastOccurenceWins, ShortName = "tcreq", DefaultValue = false, HelpText = "Show Test Case Covered Requirements.")]
+        [Argument(ArgumentType.LastOccurenceWins, ShortName = "tcreq", DefaultValue = false, HelpText = "Show executed requirements by each test-case?")]
         public bool showTestCaseCoveredRequirements = false;
     }
 }

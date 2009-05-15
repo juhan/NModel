@@ -10,7 +10,9 @@ namespace NModel.Conformance
 {
     partial class ConformanceTester
     {
-        public bool showTestCaseCoveredRequirements;
+        private bool showTestCaseCoveredRequirements;
+        private bool showMetrics;
+
         /// <summary>
         /// List of all the requirements that we want to check against 
         /// the executed requirements to get coverage metrics
@@ -29,28 +31,45 @@ namespace NModel.Conformance
         static int totalFailedTests = 0;
         static int totalExecutedTests = 0;
 
+        /// <summary>
+        /// Show executed requirements by each test-case?
+        /// </summary>
         public bool ShowTestCaseCoveredRequirements
         {
             set { showTestCaseCoveredRequirements = value; }
         }
 
-        void AddMetricsToEndOfLog()
+        /// <summary>
+        /// Show test-suite metrics at the end of the ct log?
+        /// </summary>
+        public bool ShowMetrics
         {
+            set { showMetrics = value; }
+        }
+
+        void AddMetricsToEndOfLog()
+        {            
             using (StreamWriter sw = GetStreamWriter())
             {
-                LogMetrics lm = new LogMetrics(sw);
-                writeTestsResultsSummary(lm);
-                if(FailedActionsWithMessages.IsEmpty == false)
-                    writeFailedActionsSummary(lm);
-                if (AllRequirements.Count > 0)
+                if (showMetrics == true)
                 {
-                    writeNotCoveredReqs(lm);
-                    writeNotExecutedReqs(lm);
+                    LogMetrics lm = new LogMetrics(sw);
+                    writeTestsResultsSummary(lm);
+                    if (FailedActionsWithMessages.IsEmpty == false)
+                        writeFailedActionsSummary(lm);
+                    if (AllRequirements.Count > 0)
+                    {
+                        writeNotCoveredReqs(lm);
+                        writeNotExecutedReqs(lm);
+                    }
+                    writeActionsTimeSpent(lm);
+                    lm.Write();
                 }
-                writeActionsTimeSpent(lm);
-                lm.Write();
+                else
+                {
+                    sw.WriteLine(")");
+                }
             }
-
         }
 
         private void writeTestsResultsSummary(LogMetrics lm)
