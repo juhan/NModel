@@ -292,6 +292,10 @@ namespace NModel.Internals
                 if (thisSortType != null)
                     break;
             }
+            // TODO: Value types need different handling. Exclude for now.
+            if (thisSortType != null && thisSortType.IsValueType)
+                thisSortType = null;
+                
             return thisSortType;
         }
 
