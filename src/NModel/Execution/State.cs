@@ -103,7 +103,11 @@ namespace NModel.Execution
         public SimpleState ReplaceControlMode(Term newControlMode)
         {
             SimpleState newState = new SimpleState(newControlMode, this.locationValues, this.domainMap, this.modelName, this.locationNames);
-            return cache.Get(newState);
+            return newState; // this is due a weird error occurring sometimes
+                             // that fetches a state with different contents
+                             // from the cache and returns it.
+                             // This is a quick fix and the issue needs to be investigated further.
+            //return cache.Get(newState);
         }
 
         /// <summary>
