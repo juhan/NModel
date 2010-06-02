@@ -187,6 +187,7 @@ namespace NModel.Internals
         public Type DefaultSortType(Symbol sort)
         {            
             Type result;
+
             if (sortType.TryGetValue(sort, out result))
                 return result;
 
@@ -247,7 +248,6 @@ namespace NModel.Internals
                 // Check for the type in the AppDomain assemblies - 
                 // Is it a type of another model program that is being composed with this one        
                 result = getSortTypeFromAppDomainAssemblies(namespaces, sort.Name);                             
-
             if (result == null)
                 throw new ArgumentException("No default type for sort " + sort.ToString());            
 
@@ -264,7 +264,7 @@ namespace NModel.Internals
         /// <param name="sortTypeName"></param>
         /// <returns>Type - the type of the given sort, or null if a matching type was not found</returns>
         private Type getSortTypeFromAppDomainAssemblies(string[] excludeNameSpaces, string sortTypeName)
-        {
+        {            
             Type thisSortType = null;
 
             // Get all the assemblies loaded into this AppDomain.
@@ -292,7 +292,7 @@ namespace NModel.Internals
                 if (thisSortType != null)
                     break;
             }
-            // TODO: Value types need different handling. Exclude for now.
+            // TODO: Value types need different handling. Exclude for now.            
             if (thisSortType != null && thisSortType.IsValueType)
                 thisSortType = null;
                 

@@ -1,0 +1,1 @@
+"C:\Program Files\NModel\bin\otg.exe" /r:TwoElements.dll /mp:Example_1_PM /file:TestSuite.txt

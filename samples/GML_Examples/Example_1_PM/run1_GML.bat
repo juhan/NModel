@@ -1,0 +1,1 @@
+"C:\Program Files\NModel\bin\GML.exe" /f:TwoElements.graphml /od:"C:\Program Files\NModel\samples\GML_Examples\Example_1_PM"
