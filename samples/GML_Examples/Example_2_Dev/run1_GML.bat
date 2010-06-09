@@ -1,1 +1,1 @@
-"C:\Users\i047975\Documents\NModel\NModel_Source\NModel\src\GML\bin\Debug\GML.exe" /f:TwoElements.graphml /od:"C:\Program Files\NModel\samples\GML_Examples\Example_2_Dev"
+"C:\Program Files\NModel\bin\GML.exe" /f:TwoElements.graphml /od:"C:\Program Files\NModel\samples\GML_Examples\Example_2_Dev"

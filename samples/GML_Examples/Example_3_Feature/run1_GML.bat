@@ -1,0 +1,1 @@
+"C:\Program Files\NModel\bin\GML.exe" /id:"C:\Program Files\NModel\samples\GML_Examples\Example_3_Feature" /od:"C:\Program Files\NModel\samples\GML_Examples\Example_3_Feature"

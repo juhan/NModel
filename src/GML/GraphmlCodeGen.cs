@@ -143,41 +143,11 @@ namespace NModel.Tools.GML
             }
         }
 
-        private StringBuilder ParseModel(string model, string className)
+        private void ModelStatesEnum(
+            graphmlGraph graph, 
+            ref Dictionary<string, string> states,
+            ref string endStateID)
         {
-            Dictionary<string, string> states = new Dictionary<string, string>();
-            ArrayList acceptingState = new ArrayList();
-            string endStateID = null;
-
-            string modifier = "static";
-
-            StringReader strModel = new StringReader(model);
-            // Get the graph tab of the xml into the graphmlGraph object 
-            XmlSerializer graphmlSerializer = new XmlSerializer(typeof(graphml));
-            graphml Model = (graphml)graphmlSerializer.Deserialize(strModel);
-            graphmlGraph graph = null;
-            foreach (object item in Model.Items)
-            {
-                if (item.GetType().Name.Equals("graphmlGraph"))
-                {
-                    graph = (graphmlGraph)item;
-                    break;
-                }
-            }
-
-
-            // Start creating the C# code in a StringBuilder object
-            codeModel = new StringBuilder();
-
-            codeModel.AppendLine("using System;");
-            codeModel.AppendLine("using System.Collections;");
-            codeModel.AppendLine("using System.Collections.Generic;");
-            codeModel.AppendLine("using NModel.Attributes;");
-            codeModel.AppendLine("using NModel;");
-            codeModel.AppendLine("using NModel.Execution;");
-            codeModel.AppendLine("");
-            codeModel.AppendLine("namespace " + _namespace);
-            codeModel.AppendLine("{");
             codeModel.AppendLine("    /// <summary>");
             codeModel.AppendLine("    /// Model States:");
             codeModel.AppendLine("    /// <summary>");
@@ -209,7 +179,46 @@ namespace NModel.Tools.GML
             codeModel.Append("}");
             codeModel.AppendLine("");
             codeModel.AppendLine("");
+        }
 
+        private StringBuilder ParseModel(string model, string className)
+        {
+            Dictionary<string, string> states = new Dictionary<string, string>();
+            ArrayList acceptingState = new ArrayList();
+            string endStateID = null;
+
+            string modifier = "static";
+            string modelType = "model";
+
+            StringReader strModel = new StringReader(model);
+            // Get the graph tab of the xml into the graphmlGraph object 
+            XmlSerializer graphmlSerializer = new XmlSerializer(typeof(graphml));
+            graphml Model = (graphml)graphmlSerializer.Deserialize(strModel);
+            graphmlGraph graph = null;
+            foreach (object item in Model.Items)
+            {
+                if (item.GetType().Name.Equals("graphmlGraph"))
+                {
+                    graph = (graphmlGraph)item;
+                    break;
+                }
+            }
+
+            // Start creating the C# code in a StringBuilder object
+            codeModel = new StringBuilder();
+
+            codeModel.AppendLine("using System;");
+            codeModel.AppendLine("using System.Collections;");
+            codeModel.AppendLine("using System.Collections.Generic;");
+            codeModel.AppendLine("using NModel.Attributes;");
+            codeModel.AppendLine("using NModel;");
+            codeModel.AppendLine("using NModel.Execution;");
+            codeModel.AppendLine("");
+            codeModel.AppendLine("namespace " + _namespace);
+            codeModel.AppendLine("{");
+
+            codeModel.AppendLine("");
+            
             // Make sure that Model_Config is parsed first
             foreach (graphmlGraphEdge edge in graph.edge)
             {
@@ -232,6 +241,8 @@ namespace NModel.Tools.GML
                                     {
                                         if (configBlock[curLine].Trim().StartsWith("modifier"))
                                             modifier = (configBlock[curLine].Split(':')[1].Trim());
+                                        if(configBlock[curLine].Trim().StartsWith("model_type"))
+                                            modelType = (configBlock[curLine].Split(':')[1].Trim());
                                     }
                                 }
                             }
@@ -239,6 +250,12 @@ namespace NModel.Tools.GML
                     }
                 }
             }
+
+            if (modelType == "model")
+                ModelStatesEnum(graph, ref states, ref endStateID);
+
+            if (modelType == "feature")
+                codeModel.AppendLine("    [Feature]");
 
             // Class modifier and name:
             codeModel.AppendLine("    " + modifier + " class " + className);
@@ -259,7 +276,8 @@ namespace NModel.Tools.GML
                                 string methodName = getBlock(strCode, "name")[0].ToLower();
                                 if (methodName.Equals("model_init"))
                                 {
-                                    codeModel.AppendLine("        " + modifier + " ModelStates _curState = ModelStates." + states[edge.target].Trim() + ";");
+                                    if (modelType == "model")
+                                        codeModel.AppendLine("        " + modifier + " ModelStates _curState = ModelStates." + states[edge.target].Trim() + ";");
                                     string[] initBlock = getBlock(strCode, "init");
                                     for (int curLine = 0; curLine < initBlock.Length; ++curLine)
                                     {
@@ -334,14 +352,16 @@ namespace NModel.Tools.GML
                                     codeModel.AppendLine("        {");
                                     AppendCommentsInBlock(guardBlock);
                                     SetBooleanBlock(guardBlock);
-                                    if (states.ContainsKey(edge.source)) // No key for Start and Model_Configured
+                                    if ( (modelType == "model") && (states.ContainsKey(edge.source)) ) // No key for Start and Model_Configured
                                         codeModel.AppendLine("            (_curState == ModelStates." + states[edge.source].Trim() + ")");
+                                    else if (modelType == "feature")
+                                        codeModel.AppendLine("            true");
                                     codeModel.AppendLine("            );");
                                     codeModel.AppendLine("        }");
                                     codeModel.AppendLine("");
                                 }                                
                             }
-                            else if (edge.target.Equals(endStateID))
+                            else if ( (modelType == "model") && edge.target.Equals(endStateID) )
                             {
                                 acceptingState.Add("_curState == ModelStates." + states[edge.source].Trim());
                             }
@@ -351,7 +371,7 @@ namespace NModel.Tools.GML
             }
 
             // Set the accepting state
-            if (acceptingState.Count > 0)
+            if ( (modelType == "model") && (acceptingState.Count > 0) )
             {
                 codeModel.AppendLine("        [AcceptingStateCondition]");
                 codeModel.AppendLine("        " + modifier + " bool IsAcceptingState()");
