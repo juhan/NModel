@@ -8,6 +8,7 @@ using System.IO;
 using NModel.Terms;
 using NModel;
 using NModel.Execution;
+using Action = NModel.Terms.Action;
 
 namespace NModel.Conformance
 {
