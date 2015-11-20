@@ -16,7 +16,7 @@ using Transition = NModel.Triple<NModel.Terms.Term, NModel.Terms.CompoundTerm, N
 using Node = NModel.Terms.Term;
 using NModel.Execution;
 using NModel.Internals;
-using GraphLayout = Microsoft.Glee;
+using GraphLayout = Microsoft.Msagl;
 
 
 namespace NModel.Visualization

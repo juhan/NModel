@@ -14,7 +14,7 @@ using NModel.Terms;
 using Transition = NModel.Triple<NModel.Terms.Term, NModel.Terms.CompoundTerm, NModel.Terms.Term>;
 using Node = NModel.Terms.Term;
 using NModel.Execution;
-using GraphLayout = Microsoft.Glee;
+using GraphLayout = Microsoft.Msagl;
 
 
 namespace NModel.Visualization
@@ -37,12 +37,12 @@ namespace NModel.Visualization
         private bool graphChanged;
 
         /// <summary>
-        /// Maps GLEE nodes to FSM nodes.
+        /// Maps AGL nodes to FSM nodes.
         /// </summary>
         internal Dictionary<GraphLayout.Drawing.Node, Node> nodes = new Dictionary<GraphLayout.Drawing.Node, Node>();
 
         /// <summary>
-        /// Maps GLEE edges to multilabeled transitions.
+        /// Maps AGL edges to multilabeled transitions.
         /// </summary>
         private Dictionary<GraphLayout.Drawing.Edge, MultiLabeledTransition> transitions = new Dictionary<GraphLayout.Drawing.Edge, MultiLabeledTransition>();
 
@@ -71,7 +71,7 @@ namespace NModel.Visualization
             propertyGrid.BrowsableAttributes = new AttributeCollection(RuntimeBrowsableAttribute.Yes);
 
             // Remove the viewer's default toolbar and set the whole background white.
-            viewer.RemoveToolbar();
+            viewer.ToolBarIsVisible = false;
             viewer.OutsideAreaBrush = Brushes.White;
 
             //hide MDE specific buttons:
@@ -290,7 +290,7 @@ namespace NModel.Visualization
             }
         }
 
-        GraphLayout.Drawing.Node selectedGleeNode;
+        GraphLayout.Drawing.Node selectedAglNode;
         object selectedNodeOriginalColor;
         internal Node selectedNode;
         
@@ -299,18 +299,18 @@ namespace NModel.Visualization
         {
             if (viewer.SelectedObject is GraphLayout.Drawing.Node)
             {
-                if (selectedGleeNode != viewer.SelectedObject)
+                if (selectedAglNode != viewer.SelectedObject)
                 {
                     //UnSelectPreviousSelection
-                    if (selectedGleeNode != null)
+                    if (selectedAglNode != null)
                     {
-                        SetNodeSelectionColor(selectedGleeNode, (GraphLayout.Drawing.Color)selectedNodeOriginalColor);
+                        SetNodeSelectionColor(selectedAglNode, (GraphLayout.Drawing.Color)selectedNodeOriginalColor);
                     }
-                    selectedGleeNode = (GraphLayout.Drawing.Node)viewer.SelectedObject;
-                    selectedNode = this.nodes[selectedGleeNode];
-                    RememberSelectedNodeOriginalColor(selectedGleeNode);
+                    selectedAglNode = (GraphLayout.Drawing.Node)viewer.SelectedObject;
+                    selectedNode = this.nodes[selectedAglNode];
+                    RememberSelectedNodeOriginalColor(selectedAglNode);
                     SetNodeSelectionColor(
-                    selectedGleeNode,ToGleeColor(this.selectionColor));
+                    selectedAglNode,ToAglColor(this.selectionColor));
                     this.viewer.Invalidate();
                     UpdateStateViewer();
                 }
@@ -328,10 +328,10 @@ namespace NModel.Visualization
 
         private void UnSelectPreviousSelection()
         {
-            if (selectedGleeNode != null)
+            if (selectedAglNode != null)
             {
-                SetNodeSelectionColor(selectedGleeNode,(GraphLayout.Drawing.Color)selectedNodeOriginalColor);
-                selectedGleeNode = null;
+                SetNodeSelectionColor(selectedAglNode,(GraphLayout.Drawing.Color)selectedNodeOriginalColor);
+                selectedAglNode = null;
                 selectedNode = null;
                 this.viewer.Invalidate();
                 this.stateViewer1.SetState(null);
@@ -344,13 +344,13 @@ namespace NModel.Visualization
         //node label highlighting during hovering has therefore been turned off
         private void SetNodeSelectionColor(GraphLayout.Drawing.Node n, GraphLayout.Drawing.Color c)
         {
-            //n.Attr.Fillcolor = c;
-            n.Attr.Fontcolor = c;
+            //n.Attr.FillColor = c;
+            n.Label.FontColor = c;
         }
         private void RememberSelectedNodeOriginalColor(GraphLayout.Drawing.Node n)
         {
-            //selectedNodeOriginalColor = n.Attr.Fillcolor;
-            selectedNodeOriginalColor = n.Attr.Fontcolor;
+            //selectedNodeOriginalColor = n.Attr.FillColor;
+            selectedNodeOriginalColor = n.Label.FontColor;
         }
 
         /// <summary>
@@ -501,7 +501,7 @@ namespace NModel.Visualization
             //}
             finiteAutomatonContext = faContext1;
             graphChanged = true;
-            this.selectedGleeNode = null; //forget previous selected glee node
+            this.selectedAglNode = null; //forget previous selected glee node
             this.selectedNode = null;     //forget previous selected corresponding node
             PerformLayout();
         }
@@ -560,7 +560,7 @@ namespace NModel.Visualization
 
         private void UpdateStateViewer()
         {
-            Term node = this.nodes[selectedGleeNode];
+            Term node = this.nodes[selectedAglNode];
             if (finiteAutomatonContext.stateProvider != null)
             {
                 this.stateViewer1.Title = "Variables in state " + node.ToString();
@@ -597,7 +597,7 @@ namespace NModel.Visualization
                 //always unselect any possibly selected or hovered node because the 
                 //selection will not be valid after redrawing the graph
                 this.stateViewer1.SetState(null);
-                this.selectedGleeNode = null;
+                this.selectedAglNode = null;
                 this.previouslyHoveredObject = null;
                 this.stateViewer1.Title = "No state is selected";
 
@@ -641,7 +641,7 @@ namespace NModel.Visualization
         Dictionary<MultiLabeledTransition,int> dashedEdges = new Dictionary<MultiLabeledTransition,int>();
 
         /// <summary>
-        /// Performs the work of constructing and laying out the graph in a background thread using GLEE.
+        /// Performs the work of constructing and laying out the graph in a background thread using MsAGL.
         /// </summary>
         /// <param name="sender">BackgroundWorker.</param>
         /// <param name="e">worker event args</param>
@@ -659,11 +659,11 @@ namespace NModel.Visualization
             transitions.Clear();
             dashedEdges.Clear();
 
-            // Create a new GLEE graph.
-            Microsoft.Glee.Drawing.Graph graph = new Microsoft.Glee.Drawing.Graph("Finite Automaton");
+            // Create a new Agl graph.
+            Microsoft.Msagl.Drawing.Graph graph = new Microsoft.Msagl.Drawing.Graph("Finite Automaton");
 
             // Set the layout direction.
-            graph.GraphAttr.LayerDirection = LayerDirection();
+            graph.Attr.LayerDirection = LayerDirection();
 
             // Report the total number of states and transitions.
             int progress = 0;
@@ -714,17 +714,17 @@ namespace NModel.Visualization
             {
                 if (this.finiteAutomatonContext.stateProvider != null && this.customStateLabelProvider != null)
                 {
-                    initialNode.Attr.Label = this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(this.finiteAutomatonContext.fa.InitialState));
+                    initialNode.LabelText= this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(this.finiteAutomatonContext.fa.InitialState));
                 }
             }
             else
             {
-                initialNode.Attr.Label = "";
+                initialNode.LabelText = "";
             }
             //initial progress, one node is handled
             worker.ReportProgress(++progress);
-            initialNode.Attr.Fillcolor = new GraphLayout.Drawing.Color(initialStateColor.R, initialStateColor.G, initialStateColor.B);
-            initialNode.Attr.Shape = MapToGleeShape(this.stateShape);
+            initialNode.Attr.FillColor = new GraphLayout.Drawing.Color(initialStateColor.R, initialStateColor.G, initialStateColor.B);
+            initialNode.Attr.Shape = MapToAglShape(this.stateShape);
             #endregion
 
             #region Add the transitions by walking the graph depth first
@@ -780,16 +780,16 @@ namespace NModel.Visualization
                             }
                             // add edge
                             GraphLayout.Drawing.Node toNode = graph.AddNode(tf.Third.ToString());
-                            toNode.Attr.Shape = MapToGleeShape(this.stateShape);
+                            toNode.Attr.Shape = MapToAglShape(this.stateShape);
                             if (this.nodeLabelsVisible)
                             {
                                 if (this.finiteAutomatonContext.stateProvider != null && this.customStateLabelProvider != null)
                                 {
-                                    toNode.Attr.Label = this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(tf.Third));
+                                    toNode.LabelText= this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(tf.Third));
                                 }
                             }
                             else
-                                toNode.Attr.Label = "";
+                                toNode.LabelText = "";
                             nodes[toNode] = tf.Third;
                             if (loopsVisible || fromNode.Attr.Id != toNode.Attr.Id)
                             {
@@ -824,16 +824,16 @@ namespace NModel.Visualization
                         }
                         // add edge
                         GraphLayout.Drawing.Node toNode = graph.AddNode(t.Third.ToString());
-                        toNode.Attr.Shape = MapToGleeShape(this.stateShape);
+                        toNode.Attr.Shape = MapToAglShape(this.stateShape);
                         if (this.nodeLabelsVisible)
                         {
                             if (this.finiteAutomatonContext.stateProvider != null && this.customStateLabelProvider != null)
                             {
-                                toNode.Attr.Label = this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(t.Third));
+                                toNode.LabelText = this.customStateLabelProvider(this.finiteAutomatonContext.stateProvider(t.Third));
                             }
                         }
                         else
-                            toNode.Attr.Label = "";
+                            toNode.LabelText = "";
                         nodes[toNode] = t.Third;
                         if (loopsVisible || !fromNode.Attr.Id.Equals(toNode.Attr.Id))
                         {
@@ -913,7 +913,7 @@ namespace NModel.Visualization
                 //    {
                 string lab = (this.transitionLabels != TransitionLabel.None ? trans.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
                 GraphLayout.Drawing.Edge edge = graph.AddEdge(fromNd.Attr.Id, lab, toNd.Attr.Id);
-                GraphLayout.Drawing.BaseAttr eattr = edge.EdgeAttr as GraphLayout.Drawing.BaseAttr;
+                GraphLayout.Drawing.AttributeBase eattr = edge.Attr as GraphLayout.Drawing.AttributeBase;
                 eattr.AddStyle(GraphLayout.Drawing.Style.Dashed);
                 transitions[edge] = trans;
                 dashedEdges.Add(trans,0);
@@ -944,13 +944,13 @@ namespace NModel.Visualization
 
 
                         GraphLayout.Drawing.Node n1 = graph.AddNode(n.ToString());
-                        n1.Attr.Color = ToGleeColor(Color.Gray);
-                        n1.Attr.Fontcolor = ToGleeColor(Color.Gray);
-                        n1.Attr.Shape = MapToGleeShape(this.StateShape);
+                        n1.Attr.Color = ToAglColor(Color.Gray);
+                        n1.Label.FontColor = ToAglColor(Color.Gray);
+                        n1.Attr.Shape = MapToAglShape(this.StateShape);
                         nodes[n1] = n;
                         if (!this.nodeLabelsVisible)
                         {
-                            n1.Attr.Label = "";
+                            n1.LabelText = "";
                         }
 
                         foreach (Triple<Term, CompoundTerm, Term> t in exitingTransitions[n])
@@ -977,8 +977,8 @@ namespace NModel.Visualization
                             {
                                 string lab = (this.transitionLabels != TransitionLabel.None ? t1.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
                                 GraphLayout.Drawing.Edge e1 = graph.AddEdge(n1.Attr.Id, lab, n2.Attr.Id);
-                                e1.EdgeAttr.Fontcolor = ToGleeColor(Color.Gray);
-                                e1.EdgeAttr.Color = ToGleeColor(Color.Gray);
+                                e1.Label.FontColor = ToAglColor(Color.Gray);
+                                e1.Attr.Color = ToAglColor(Color.Gray);
                                 transitions[e1] = t1;
                             }
                             else
@@ -987,8 +987,8 @@ namespace NModel.Visualization
                                 {
                                     string lab = (this.transitionLabels != TransitionLabel.None ? t2.CombinedLabel(this.transitionLabels == TransitionLabel.ActionSymbol) : "");
                                     GraphLayout.Drawing.Edge e1 = graph.AddEdge(n1.Attr.Id, lab, n2.Attr.Id);
-                                    e1.EdgeAttr.Fontcolor = ToGleeColor(Color.Gray);
-                                    e1.EdgeAttr.Color = ToGleeColor(Color.Gray);
+                                    e1.Label.FontColor = ToAglColor(Color.Gray);
+                                    e1.Attr.Color = ToAglColor(Color.Gray);
                                     transitions[e1] = t2;
                                 }
                             }
@@ -1007,8 +1007,8 @@ namespace NModel.Visualization
                 Set<Node> deadNodes = finiteAutomatonContext.deadNodes.Intersect(visited);
                 foreach (Node deadNode in deadNodes)
                 {
-                    GraphLayout.Drawing.Node deadGleeNode = graph.AddNode(deadNode.ToString());
-                    deadGleeNode.Attr.Fillcolor =
+                    GraphLayout.Drawing.Node deadAglNode = graph.AddNode(deadNode.ToString());
+                    deadAglNode.Attr.FillColor =
                        new GraphLayout.Drawing.Color(deadStateColor.R, deadStateColor.G, deadStateColor.B);
                 }
             }
@@ -1016,8 +1016,8 @@ namespace NModel.Visualization
             //while (stack.Count > 0)
             //{
             //    Node truncatedNode = stack.Pop();
-            //    GraphLayout.Drawing.Node truncatedGleeNode = graph.AddNode(truncatedNode.ToString());
-            //    truncatedGleeNode.Attr.Fillcolor =
+            //    GraphLayout.Drawing.Node truncatedAglNode = graph.AddNode(truncatedNode.ToString());
+            //    truncatedAglNode.Attr.Fillcolor =
             //        new GraphLayout.Drawing.Color(truncatedStateColor.R, truncatedStateColor.G, truncatedStateColor.B);
             //}
 
@@ -1027,9 +1027,9 @@ namespace NModel.Visualization
             {
                 foreach (Node accNode in finiteAutomatonContext.fa.AcceptingStates.Intersect(visited))
                 {
-                    GraphLayout.Drawing.Node acceptingGleeNode = graph.AddNode(accNode.ToString());
-                    acceptingGleeNode.Attr.Shape = MapToGleeShape(stateShape);
-                    acceptingGleeNode.Attr.LineWidth = 4;
+                    GraphLayout.Drawing.Node acceptingAglNode = graph.AddNode(accNode.ToString());
+                    acceptingAglNode.Attr.Shape = MapToAglShape(stateShape);
+                    acceptingAglNode.Attr.LineWidth = 4;
                 }
             }
 
@@ -1046,9 +1046,9 @@ namespace NModel.Visualization
                         {
                             this.finiteAutomatonContext.unsafeNodes = 
                                 this.finiteAutomatonContext.unsafeNodes.Add(visitedNode);
-                            GraphLayout.Drawing.Node visitedGleeNode = graph.AddNode(visitedNode.ToString());
-                            visitedGleeNode.Attr.Shape = MapToGleeShape(stateShape);
-                            visitedGleeNode.Attr.Fillcolor = ToGleeColor(this.unsafeStateColor);
+                            GraphLayout.Drawing.Node visitedAglNode = graph.AddNode(visitedNode.ToString());
+                            visitedAglNode.Attr.Shape = MapToAglShape(stateShape);
+                            visitedAglNode.Attr.FillColor = ToAglColor(this.unsafeStateColor);
                         }
                     }
                 }
@@ -1065,16 +1065,16 @@ namespace NModel.Visualization
             e.Result = viewer.CalculateLayout(graph);
         }
 
-        private Microsoft.Glee.Drawing.LayerDirection LayerDirection()
+        private Microsoft.Msagl.Drawing.LayerDirection LayerDirection()
         {
-            return direction == GraphDirection.TopToBottom ? Microsoft.Glee.Drawing.LayerDirection.TB :
-                            direction == GraphDirection.LeftToRight ? Microsoft.Glee.Drawing.LayerDirection.LR :
-                            direction == GraphDirection.RightToLeft ? Microsoft.Glee.Drawing.LayerDirection.RL :
-                            direction == GraphDirection.BottomToTop ? Microsoft.Glee.Drawing.LayerDirection.BT :
-                            Microsoft.Glee.Drawing.LayerDirection.None;
+            return direction == GraphDirection.TopToBottom ? Microsoft.Msagl.Drawing.LayerDirection.TB :
+                            direction == GraphDirection.LeftToRight ? Microsoft.Msagl.Drawing.LayerDirection.LR :
+                            direction == GraphDirection.RightToLeft ? Microsoft.Msagl.Drawing.LayerDirection.RL :
+                            direction == GraphDirection.BottomToTop ? Microsoft.Msagl.Drawing.LayerDirection.BT :
+                            Microsoft.Msagl.Drawing.LayerDirection.None;
         }
 
-        static GraphLayout.Drawing.Shape MapToGleeShape(StateShape shape)
+        static GraphLayout.Drawing.Shape MapToAglShape(StateShape shape)
         {
             switch (shape)
             {
@@ -1177,13 +1177,13 @@ namespace NModel.Visualization
 
         void ReselectNode()
         {
-            //find the corresponding new glee node, if it exists
-            this.selectedGleeNode = this.FindGleeNode(selectedNode);
-            if (this.selectedGleeNode != null)
+            //find the corresponding new AGL node, if it exists
+            this.selectedAglNode = this.FindAglNode(selectedNode);
+            if (this.selectedAglNode != null)
             {
-                RememberSelectedNodeOriginalColor(selectedGleeNode);
+                RememberSelectedNodeOriginalColor(selectedAglNode);
                 SetNodeSelectionColor(
-                selectedGleeNode,ToGleeColor(this.selectionColor));
+                selectedAglNode,ToAglColor(this.selectionColor));
                 this.viewer.Invalidate();
                 UpdateStateViewer();
             }
@@ -1193,7 +1193,7 @@ namespace NModel.Visualization
             }
         }
 
-        GraphLayout.Drawing.Node FindGleeNode(Node node)
+        GraphLayout.Drawing.Node FindAglNode(Node node)
         {
             foreach (KeyValuePair<GraphLayout.Drawing.Node,Node> entry in this.nodes)
             {
@@ -1379,12 +1379,12 @@ namespace NModel.Visualization
             }
         }
 
-        static GraphLayout.Drawing.Color ToGleeColor(Color c)
+        static GraphLayout.Drawing.Color ToAglColor(Color c)
         {
             return new GraphLayout.Drawing.Color(c.R, c.G, c.B);
         }
 
-        // So we can write our own alternative to ToGleeColor
+        // So we can write our own alternative to ToAglColor
         struct DotColor
         {
             byte R, G, B; 
@@ -1419,7 +1419,7 @@ namespace NModel.Visualization
                 else if (previouslyHoveredObject is GraphLayout.Drawing.Edge)
                 {
                     ((GraphLayout.Drawing.Edge)previouslyHoveredObject).Attr.Color = previouslyHoveredObjectColor;
-                    ((GraphLayout.Drawing.Edge)previouslyHoveredObject).Attr.Fontcolor = previouslyHoveredObjectFontColor;
+                    ((GraphLayout.Drawing.Edge)previouslyHoveredObject).Label.FontColor = previouslyHoveredObjectFontColor;
                 }
             }
             GraphLayout.Drawing.Node newSelectionNode = newSelection as GraphLayout.Drawing.Node;
@@ -1432,7 +1432,7 @@ namespace NModel.Visualization
             else if (newSelectionEdge != null)
             {
                 previouslyHoveredObjectColor = newSelectionEdge.Attr.Color;
-                previouslyHoveredObjectFontColor = newSelectionEdge.Attr.Fontcolor;
+                previouslyHoveredObjectFontColor = newSelectionEdge.Label.FontColor;
             }
             this.previouslyHoveredObject = newSelection;
         }
@@ -1443,7 +1443,7 @@ namespace NModel.Visualization
             GraphLayout.Drawing.Node node = viewer.SelectedObject as GraphLayout.Drawing.Node;
             if (node != null)
             {
-                GraphLayout.Drawing.Color c = ToGleeColor(this.hoverColor);
+                GraphLayout.Drawing.Color c = ToAglColor(this.hoverColor);
                 node.Attr.Color = c;
                 //node.Attr.Fontcolor = c;
                 if (this.finiteAutomatonContext.stateProvider != null && this.customStateTooltipProvider != null)
@@ -1470,9 +1470,9 @@ namespace NModel.Visualization
             GraphLayout.Drawing.Edge edge = viewer.SelectedObject as GraphLayout.Drawing.Edge;
             if (edge != null)
             {
-                GraphLayout.Drawing.Color c = ToGleeColor(this.hoverColor);
+                GraphLayout.Drawing.Color c = ToAglColor(this.hoverColor);
                 edge.Attr.Color = c;
-                edge.Attr.Fontcolor = c;
+                edge.Label.FontColor = c;
                 MultiLabeledTransition transition = transitions[edge];
                 selectedItemToolTip.SetToolTip(viewer.DrawingPanel, transition.CombinedLabel(false));
                 this.viewer.Invalidate();

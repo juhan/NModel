@@ -79,7 +79,7 @@ namespace NModel.Visualization
             this.selectNextNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectPreviousNodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.viewer = new Microsoft.Glee.GraphViewerGdi.GViewer();
+            this.viewer = new Microsoft.Msagl.GraphViewerGdi.GViewer();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.stateViewer1 = new NModel.Visualization.StateViewer();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -544,7 +544,7 @@ namespace NModel.Visualization
             this.viewer.ZoomWindowThreshold = 0.05;
             this.viewer.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.viewer_MouseWheel);
             this.viewer.Load += new System.EventHandler(this.viewer_Load);
-            this.viewer.SelectionChanged += new System.EventHandler(this.viewer_SelectionChanged);
+            this.viewer.ObjectUnderMouseCursorChanged += new System.EventHandler<Microsoft.Msagl.Drawing.ObjectUnderMouseCursorChangedEventArgs>(this.viewer_SelectionChanged);
             // 
             // splitter1
             // 
@@ -635,6 +635,6 @@ namespace NModel.Visualization
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.ToolStripMenuItem sheHideHelpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsFSMToolStripMenuItem;
-        internal Microsoft.Glee.GraphViewerGdi.GViewer viewer;
+        internal Microsoft.Msagl.GraphViewerGdi.GViewer viewer;
     }
 }
