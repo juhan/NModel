@@ -1,4 +1,4 @@
-# NModel: Library for model-based testing in C\#
+# NModel: Library for model-based testing in C# (and F#)
 
 NModel (branched from http://nmodel.codeplex.com) is a model-based testing library written by Colin Campbell and Margus Veanes.  
 
