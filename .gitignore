@@ -62,4 +62,5 @@ paket-files/
 
 *.dll
 *.exe
+*.pdb
 *.exe.config
