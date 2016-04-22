@@ -59,3 +59,7 @@ paket-files/
 # NuGet v3's project.json files produces more ignoreable files
 *.nuget.props
 *.nuget.targets
+
+*.dll
+*.exe
+*.exe.config
