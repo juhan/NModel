@@ -64,3 +64,11 @@ paket-files/
 *.exe
 *.pdb
 *.exe.config
+
+#Emacs backup files should be ignored
+
+*.*~
+
+# Visual studio upgrade log files are irrelevant for GIT
+
+UpgradeLog.htm
