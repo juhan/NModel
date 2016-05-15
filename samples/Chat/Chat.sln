@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.TestHarness", "ChatImpl\TestHarness\Chat.TestHarness.csproj", "{0E3F03E2-71B2-4A68-B02C-7963F61E96E6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.TcpClient", "ChatImpl\TcpClient\Chat.TcpClient.csproj", "{512E2BE8-4E11-4B93-8E56-A3D3F1FAE0AA}"

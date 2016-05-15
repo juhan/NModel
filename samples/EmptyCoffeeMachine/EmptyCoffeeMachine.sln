@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyCoffeeMachineModel", "Model\EmptyCoffeeMachineModel.csproj", "{3FCB2992-69BD-45B1-A053-1377812F38FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyCoffeeMachineImpl", "Impl\EmptyCoffeeMachineImpl.csproj", "{5E415E53-1CE0-44DA-AFBD-F5153B8C81DA}"
