@@ -113,10 +113,10 @@ namespace NModel.Visualization
                         throw new ModelProgramUserException("Invalid model program specifier '" + mps + "'.");
                     }
                     string mpName = mpsSplit[0];
-                    Assembly mpAssembly = ReflectionHelper.FindAssembly(libs,mpName);
+                    Assembly mpAssembly = ReflectionHelper.FindAssembly(libs, mpName);
                     Set<string> mpFeatures = new Set<string>(mpsSplit).Remove(mpName);
                     ModelProgram mp1 = new LibraryModelProgram(mpAssembly, mpName, mpFeatures);
-                    mp = (mp == null ? mp1 : new ProductModelProgram(mp,mp1));
+                    mp = (mp == null ? mp1 : new ProductModelProgram(mp, mp1));
                 }
             }
 
@@ -136,7 +136,7 @@ namespace NModel.Visualization
                     foreach (CompoundTerm testCaseTerm in testSuite.Arguments)
                     {
                         Sequence<CompoundTerm> testCase =
-                            testCaseTerm.Arguments.Convert<CompoundTerm>(delegate(Term t) { return (CompoundTerm)t; });
+                            testCaseTerm.Arguments.Convert<CompoundTerm>(delegate (Term t) { return (CompoundTerm)t; });
                         testcases = testcases.AddLast(testCase);
                     }
                 }
@@ -195,7 +195,7 @@ namespace NModel.Visualization
                         mp = new ProductModelProgram(mp, fsmmp);
                 }
             }
-            
+
             ModelProgramGraphViewForm form = new ModelProgramGraphViewForm("Model Program Viewer");
             //configure the settings of the viewer
             form.View.AcceptingStatesMarked = settings.acceptingStatesMarked;
@@ -436,7 +436,63 @@ namespace NModel.Visualization
         [Argument(ArgumentType.LastOccurenceWins, ShortName = "", DefaultValue = "Test", HelpText = "Name of start action of a test case. This value is used only if a testSuite is provided.")]
         public string startTestAction;
 
-        [Argument(ArgumentType.AtMostOnce, DefaultValue=false, ShortName="",HelpText="Whether the State View is visible.")]
+        [Argument(ArgumentType.AtMostOnce, DefaultValue = false, ShortName = "", HelpText = "Whether the State View is visible.")]
         public bool stateViewVisible;
     }
+
+    public static class Interactive {
+
+        /// <summary>
+        /// Provides programmatic access to the ModelProgramViewer commandline utility 'mpv.exe'.
+        /// </summary>
+        /// <param name="args">command line arguments: model program(s), optional settings for the viewer</param>
+        /// <remarks>The settings are displayed when 'mpv.exe /?' is executed from the command line without arguments.</remarks>
+        public static void Run(ModelProgram mp)
+        {
+
+            ProgramSettings settings = new ProgramSettings();
+
+            //ModelProgram mp = (ModelProgram)lmp;
+
+            ModelProgramGraphViewForm form = new ModelProgramGraphViewForm("Model Program Viewer");
+            //configure the settings of the viewer
+            form.View.AcceptingStatesMarked = settings.acceptingStatesMarked;
+            form.View.TransitionLabels = settings.transitionLabels;
+            form.View.CombineActions = settings.combineActions;
+            form.View.Direction = settings.direction;
+            form.View.UnsafeStateColor = Color.FromName(settings.unsafeStateColor);
+            form.View.HoverColor = Color.FromName(settings.hoverColor);
+            form.View.InitialStateColor = Color.FromName(settings.initialStateColor);
+            form.View.LoopsVisible = settings.loopsVisible;
+            form.View.MaxTransitions = settings.maxTransitions;
+            form.View.NodeLabelsVisible = settings.nodeLabelsVisible;
+            form.View.SelectionColor = Color.FromName(settings.selectionColor);
+            form.View.MergeLabels = settings.mergeLabels;
+            form.View.StateShape = settings.stateShape;
+            form.View.DeadStateColor = Color.FromName(settings.deadStateColor);
+            form.View.InitialTransitions = settings.initialTransitions;
+            form.View.LivenessCheckIsOn = settings.livenessCheckIsOn;
+            form.View.ExcludeIsomorphicStates = settings.excludeIsomorphicStates;
+            form.View.SafetyCheckIsOn = settings.safetyCheckIsOn;
+            form.View.DeadstatesVisible = settings.deadStatesVisible;
+            form.View.StateViewVisible = settings.stateViewVisible;
+
+            //show the view of the product of all the model programs
+            form.View.SetModelProgram(mp);
+
+            form.OnSaveSettings += new EventHandler(settings.SaveSettings);
+            form.ShowDialog();
+        }
+
+        private static Set<Symbol> GetActionSymbols(Sequence<Sequence<CompoundTerm>> testcases)
+        {
+            Set<Symbol> symbs = Set<Symbol>.EmptySet;
+            foreach (Sequence<CompoundTerm> testcase in testcases)
+                foreach (CompoundTerm action in testcase)
+                    symbs = symbs.Add(action.Symbol);
+            return symbs;
+        }
+    }
+
 }
+

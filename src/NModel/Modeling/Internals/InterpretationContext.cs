@@ -322,11 +322,14 @@ namespace NModel.Internals
             if (sortType.ContainsKey(sort))
             {
                 if (!sortType[sort].Equals(t))
-                    throw new InvalidOperationException("Sort " + sort.ToString() + " has already been registered in this context with a different type.");
+                    throw new InvalidOperationException("Sort " + sort.ToString() +
+                        " has already been registered in this context with a different type: " +
+                        t.ToString()+".");
             }
             else
             {
                 sortType.Add(sort, t);
+                Console.Out.WriteLine("Added sort: " + t.ToString());
             }
         }
 

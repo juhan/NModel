@@ -1193,7 +1193,7 @@ namespace NModel.Execution
                             if (null != parameterGenerator)
                             {
                                 Set<Term> newValues = parameterGenerator();
- 
+
                                 values = (null == values) ? newValues : IntersectWithAny(values ,newValues);
                             }
                         }
@@ -1351,6 +1351,7 @@ namespace NModel.Execution
                         {
                             foreach (Sequence<Term> args in AllParameterCombinations(state, actionSymbol))
                             {
+
                                 // State may need to be reset if someone calls GetActions recursively.
                                 SetState(state);
                                 this.context.SetAsActive();
@@ -1469,7 +1470,6 @@ namespace NModel.Execution
 
 
                     SimpleState midState = startState1.ReplaceControlMode(PushStackFrame(startState.ControlMode, action));
-
                     MachineStep step = DoStep(midState);
 
                     this.AddContinuation(midState, step.Action, step.TargetState);
