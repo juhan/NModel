@@ -10,66 +10,66 @@ using Transition = NModel.Triple<NModel.Terms.Term, NModel.Terms.CompoundTerm, N
 
 namespace NModel.Execution
 {
+    #region FSM Control State
+    public sealed class FsmState : CompoundValue, IState
+    {
+        /// <summary>
+        /// DFA states are sets of NFA states. The set represents all of the possible
+        /// NFA states that are possible given the trace so far.
+        /// </summary>
+        readonly Set<Term> automatonStates;
+
+        // must be kept in sync with list of fields
+        public override IEnumerable<IComparable> FieldValues()
+        {
+            yield return this.automatonStates;
+        }
+
+        public Set<Term> AutomatonStates { get { return this.automatonStates; } }
+
+        public FsmState(Set<Term> automatonStates)
+        {
+            this.automatonStates = automatonStates;
+        }
+
+        #region IState Members
+
+        public Term ControlMode
+        {
+            get
+            {
+                if (this.automatonStates.Count == 1)
+                    //if the state is singleton set, just use the term in that state
+                    return this.automatonStates.Choose();
+                else
+                    return new CompoundTerm(new Symbol("Set", new Symbol("Term")), new Sequence<Term>(this.automatonStates));
+            }
+        }
+
+        //public Term GetLocationValue(int i)
+        //{
+        //    throw new ArgumentOutOfRangeException("i");
+        //}
+
+        //public int LocationValuesCount
+        //{
+        //    get { return 0; }
+        //}
+
+        //public Map<string, int> DomainMap
+        //{
+        //    get { return Map<string, int>.EmptyMap; }
+        //}
+
+        #endregion
+    }
+    #endregion
     /// <summary>
     /// A model program constructed from a (potentially nondeterministic finite automaton). The internal
     /// states of the model program are chosen so that actions are deterministic.
     /// </summary>
     public class FsmModelProgram : ModelProgram, IName
     {
-        #region FSM Control State
-        sealed class FsmState : CompoundValue, IState
-        {
-            /// <summary>
-            /// DFA states are sets of NFA states. The set represents all of the possible
-            /// NFA states that are possible given the trace so far.
-            /// </summary>
-            readonly Set<Term> automatonStates;
-
-            // must be kept in sync with list of fields
-            public override IEnumerable<IComparable> FieldValues()
-            {
-                yield return this.automatonStates;
-            }
-
-            public Set<Term> AutomatonStates { get { return this.automatonStates; } }
-
-            public FsmState(Set<Term> automatonStates)
-            {
-                this.automatonStates = automatonStates;
-            }
-
-            #region IState Members
-
-            public Term ControlMode
-            {
-                get 
-                {
-                    if (this.automatonStates.Count == 1)
-                        //if the state is singleton set, just use the term in that state
-                        return this.automatonStates.Choose();
-                    else
-                        return new CompoundTerm(new Symbol("Set", new Symbol("Term")), new Sequence<Term>(this.automatonStates));
-                }
-            }
-
-            //public Term GetLocationValue(int i)
-            //{
-            //    throw new ArgumentOutOfRangeException("i");
-            //}
-
-            //public int LocationValuesCount
-            //{
-            //    get { return 0; }
-            //}
-
-            //public Map<string, int> DomainMap
-            //{
-            //    get { return Map<string, int>.EmptyMap; }
-            //}
-
-            #endregion
-        } 
-        #endregion
   
         #region Parameter id 
         /// <summary>
@@ -517,7 +517,7 @@ namespace NModel.Execution
                 foreach (Transition t in outgoing)
                 {
                     CompoundTerm ct = t.Second as CompoundTerm;
-                    if (ct == null) throw new InvalidOperationException("Internal error");
+                    if (ct == null) throw new InvalidOperationException("Internal error, invalid transition. FSM transition action symbol is null in "+t.ToString());
                     if (IsCompatibleTerm(action, ct)) //(Object.Equals(ct, action))
                     {
                         targetAutomatonStates = targetAutomatonStates.Add(t.Third);

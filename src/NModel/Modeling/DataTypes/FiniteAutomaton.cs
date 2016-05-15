@@ -23,6 +23,27 @@ namespace NModel
         readonly Set<Symbol> actionSymbols;
         bool isDet;
 
+
+        /// <summary>
+        /// Create an FSM from a string representation of a compound term fsm of the form 
+        /// FSM(initialState, acceptingStates, transitions [, vocabulary])
+        /// where:  
+        ///  - initialState is a term, 
+        ///  - acceptingStates is a compound term of the form AcceptingStates(p1,...,pk) 
+        ///  - transitions is a compound term of the form Transitions(t1,...,tl)
+        ///    where each ti is compound term of the form t(q,a,q') where 
+        ///    q and q' are states and a is a compound term 
+        ///  - vocabulary is optional, if present it must be 
+        ///    a compound term of the form Vocabulary(s1,...,sn) where 
+        ///    each si is a string literal
+        /// </summary>
+        /// <param name="fsm">string representation of an FSM</param>
+        /// <returns>FSM corresponding to fsm</returns>
+        public static FSM FromString(string fsm) {
+            return FromTerm(CompoundTerm.Parse(fsm));
+        }
+
+
         /// <summary>
         /// Create an FSM from a compound term fsm of the form 
         /// FSM(initialState, acceptingStates, transitions [, vocabulary])
