@@ -23,5 +23,14 @@ namespace NModel.Tests
             Assert.AreEqual(result.TransitionCount, 2, "The transition count returned differs from actual...");
 
         }
+
+        [Test]
+        public void FSMReachTest()
+        {
+            FSM fsm = FSM.FromString("FSM(0,AcceptingStates(1),Transitions(t(0, a(), 1)),Vocabulary(\"a\"))");
+            FsmModelProgram fsmmp = new FsmModelProgram(fsm, "Scenario");
+            ReachabilityResult result = NModel.Algorithms.Reachability.Check(fsmmp, "Scenario(1)");
+            Assert.AreEqual(result.GoalReached, true);
+        }
     }
 }
